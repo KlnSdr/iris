@@ -1,5 +1,5 @@
-#include "io.hpp"
-#include "config.hpp"
+#include "io/io.hpp"
+#include "config/config.hpp"
 
 int main() {
     char buffer[config::bufferSize];
