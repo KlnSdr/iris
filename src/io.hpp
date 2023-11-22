@@ -3,11 +3,12 @@
 
 #include<iostream>
 
-
 class io {
 public:
     static bool hasData();
-    static unsigned int readBuffer(char* buffer, unsigned int size);
+
+    static unsigned int readBuffer(char *buffer, unsigned int size);
+
 private:
     static char readByte();
 };

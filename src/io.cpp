@@ -5,8 +5,7 @@
  *
  * @return true if there is data available, false otherwise.
  */
-bool io::hasData()
-{
+bool io::hasData() {
     return !std::cin.eof();
 }
 
@@ -15,8 +14,7 @@ bool io::hasData()
  *
  * @return The byte read from the input.
  */
-char io::readByte()
-{
+char io::readByte() {
     char tmpBuffer[1];
     std::cin.read(tmpBuffer, 1);
 
@@ -30,10 +28,8 @@ char io::readByte()
  * @param size The size of the buffer.
  * @return The number of bytes left in the buffer
  */
-unsigned int io::readBuffer(char *buffer, unsigned int size)
-{
-    while (hasData() && size > 0)
-    {
+unsigned int io::readBuffer(char *buffer, unsigned int size) {
+    while (hasData() && size > 0) {
         *buffer = readByte();
         buffer++;
         size--;
