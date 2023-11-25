@@ -2,6 +2,7 @@
 #include "config/config.hpp"
 
 int main() {
+    config::setup();
     char buffer[config::bufferSize];
 
     while (io::hasData()) {
