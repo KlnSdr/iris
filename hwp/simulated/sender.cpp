@@ -20,26 +20,26 @@ int main(){
     SimClient::connectSim();
     
     writeNibble(0);
-    sleepMs(20);
+    sleepMs(10);
 
-    char let[5] = {'A', 'B', 'C','D','E'};
+    char let[12] = {'H', 'E', 'L', 'L', 'O', '_', 'W', 'O', 'R', 'L', 'D', '!'};
 
     int i= 0;
 
-    while(i <= 4) {
+    while(i <= 11) {
         int m = (int)let[i] & 0xF0;
         int n = (int)let[i] & 0x0F;
         int o= m >> 4;
         i++;
 
         writeNibble(o);
-        sleepMs(20);
+        sleepMs(10);
         writeNibble(0);
-        sleepMs(20);
+        sleepMs(10);
         writeNibble(n);
-        sleepMs(20);
+        sleepMs(10);
         writeNibble(0);
-        sleepMs(40);
+        sleepMs(10);
     }
 
     SimClient::disconnect();
