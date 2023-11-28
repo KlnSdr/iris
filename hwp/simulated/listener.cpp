@@ -1,12 +1,26 @@
 #include <iostream>
-#include <b15f/b15f.h>
+#include "simClient.hpp"
 #include <iomanip>
+#include <unistd.h>
+#include <vector>
 
 using namespace std;
 
+int readPins() {
+    std::vector<bool> pins = SimClient::readPins({8, 9, 0xa, 0xb});
+    int value = 0;
+    for (int i = 0; i < pins.size(); i++) {
+        value += pins[i] << i;
+    }
+    return value;
+}
+
+void sleepMs(int ms) {
+    usleep(ms * 1000);
+}
+
 int main() {
-	B15F& drv = B15F::getInstance();
-	drv.setRegister(&DDRA, 0x00);
+    SimClient::connectSim();
 
 	int buffer = 0;
 	int offset = 0;
@@ -14,8 +28,7 @@ int main() {
 	int pause = 0;
 
 	while(1) {
-		int value = (int) drv.getRegister(&PINA);
-		std::cout << std::hex << value << std::endl;
+		int value = readPins();
 		if (value != 0 && wasNull) {
 			pause = 0;
 
@@ -40,6 +53,6 @@ int main() {
 			offset = 0;
 			pause = 0;
 		}
-		drv.delay_ms(250);
+		sleepMs(10);
 	}
 }
