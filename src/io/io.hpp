@@ -7,7 +7,7 @@ class io {
 public:
     static bool hasData();
 
-    static unsigned int readBuffer(char *buffer, unsigned int size);
+    static unsigned int readBuffer(char *buffer, unsigned int size, unsigned int offset = 0);
 
 private:
     static char readByte();

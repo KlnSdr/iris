@@ -7,6 +7,7 @@
 
 #include "../io/io.hpp"
 #include "../config/config.hpp"
+#include "../package/Package.hpp"
 
 class Reader {
 public:

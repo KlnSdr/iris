@@ -28,7 +28,11 @@ char io::readByte() {
  * @param size The size of the buffer.
  * @return The number of bytes left in the buffer
  */
-unsigned int io::readBuffer(char *buffer, unsigned int size) {
+unsigned int io::readBuffer(char *buffer, unsigned int size, unsigned int offset) {
+    if (offset > 0 && offset < size) {
+        buffer += offset;
+        size -= offset;
+    }
     while (hasData() && size > 0) {
         *buffer = readByte();
         buffer++;

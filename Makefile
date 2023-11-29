@@ -43,7 +43,7 @@ directories:
 all: directories $(TARGET)
 
 run: all
-	$(TARGET)
+	@$(TARGET)
 
 # Default target
 .DEFAULT_GOAL := all
