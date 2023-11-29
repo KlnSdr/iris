@@ -1,0 +1,17 @@
+//
+// Created by kilian on 29.11.23.
+//
+
+#ifndef IRIS_READER_HPP
+#define IRIS_READER_HPP
+
+#include "../io/io.hpp"
+#include "../config/config.hpp"
+
+class Reader {
+public:
+    static void read();
+};
+
+
+#endif //IRIS_READER_HPP
