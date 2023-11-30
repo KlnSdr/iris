@@ -31,7 +31,6 @@ int main() {
 		int value = (int) drv.getRegister(&PINA);
 		if (compareWert == value){
 			drv.delay_ms(250);
-			std::cout << std::hex << value << "----------------------------------------------------------------------" << std::endl;	
 			continue;
 		}
 		compareWert = value;
@@ -42,25 +41,22 @@ int main() {
 		}
 		if(value == begin && beginbool == false){
 			beginbool = true;
+			endbool = false;
 			drv.delay_ms(250);
 			continue;	
 		}
-		if(value == end ){
-			endbool = true;
-		}
+		
 		
 		if(value == end && esc2bool == true){
 			endbool = false;
 			esc2bool = false;
 			
+		} else if(value == end && esc2bool == false){
+			endbool = true;
+			beginbool = false;
 		}
 		
 		if (beginbool == true && endbool == false && esc2bool == false){
-		
-		
-		
-		std::cout << std::hex << value << std::endl;
-		
 		
 			pause = 0;
 
@@ -70,7 +66,7 @@ int main() {
 			wasNull = false;
 
 			if (offset > 4){
-				std::cout << std::hex << buffer << " => " << static_cast<char>(buffer) << std::endl;
+				std::cout << static_cast<char>(buffer) << std::flush;
 				offset = 0;
 				buffer = 0;
 			}
@@ -84,10 +80,7 @@ int main() {
 		
 	}else 
 	{
-		std::cout << std::hex << value << "----------------------------------------------------------------------" << std::endl;	
-		
-		drv.delay_ms(250);
-		
+			drv.delay_ms(250);	
 		
 	}
 }
