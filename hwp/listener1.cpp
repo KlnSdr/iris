@@ -12,11 +12,11 @@ int main() {
 	bool escbool = false;
 	const char esc2 = 0x0D;
 	bool esc2bool = false;
-	int esc2zaehler = 1;
+	int beginzaehler = 1;
 	
 	const char begin = 0x05;
 	bool  beginbool= false;
-	int beginzaehler = 1;
+	
 	const char end = 0x07;
 	bool endbool = false;
 
@@ -40,24 +40,27 @@ int main() {
 			esc2bool = true;
 			
 		}
-		if(value == begin){
-			beginbool = true;	
+		if(value == begin && beginbool == false){
+			beginbool = true;
+			drv.delay_ms(250);
+			continue;	
 		}
 		if(value == end ){
 			endbool = true;
 		}
 		
-		if(value == end && esc2zaehler  < 1){
+		if(value == end && esc2bool == true){
 			endbool = false;
+			esc2bool = false;
 			
 		}
-			
+		
 		if (beginbool == true && endbool == false && esc2bool == false){
 		
-		if(beginzaehler < 1){
+		
 		
 		std::cout << std::hex << value << std::endl;
-		esc2zaehler = 1;
+		
 		
 			pause = 0;
 
@@ -78,17 +81,11 @@ int main() {
 			pause = 0;
 		}
 		drv.delay_ms(250);
-		}else{beginzaehler--;
-			std::cout << std::hex << value << std::endl;
-			drv.delay_ms(500);
-		}
+		
 	}else 
 	{
 		std::cout << std::hex << value << "----------------------------------------------------------------------" << std::endl;	
-		if(esc2bool == true){
-			esc2zaehler--;
-		}
-		esc2bool = false;
+		
 		drv.delay_ms(250);
 		
 		
@@ -96,3 +93,5 @@ int main() {
 }
 
 }
+
+
