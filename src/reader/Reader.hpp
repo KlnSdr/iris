@@ -7,7 +7,10 @@
 
 class Reader {
 public:
-    static void read();
+    static bool read();
+private:
+    static char mainBuffer[config::bufferSize];
+    static unsigned int mainBufferOffset;
 };
 
 

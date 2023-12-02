@@ -1,21 +1,22 @@
 #include "Reader.hpp"
 
-void Reader::read() {
-    char mainBuffer[config::bufferSize];
-    unsigned int mainBufferOffset = 0;
+unsigned int Reader::mainBufferOffset = 0;
+char Reader::mainBuffer[config::bufferSize];
 
-    while (io::hasData()) {
-        unsigned int sizeLeft = io::readBuffer(mainBuffer, config::bufferSize, mainBufferOffset);
-
-        // do stuff with buffer
-        mainBufferOffset = Package::package(mainBuffer, config::bufferSize - sizeLeft);
-
-        if (mainBufferOffset > 0) {
-            std::copy(mainBuffer + (config::bufferSize - sizeLeft - mainBufferOffset),
-                      mainBuffer + (config::bufferSize - sizeLeft), mainBuffer);
-        }
-
-        // std::cout.write(mainBuffer, config::bufferSize - sizeLeft);
+bool Reader::read() {
+    if (!io::hasData() && Reader::mainBufferOffset == 0) {
+        return false;
     }
 
+    unsigned int sizeLeft = io::readBuffer(Reader::mainBuffer, config::bufferSize, Reader::mainBufferOffset);
+
+    // do stuff with buffer
+    Reader::mainBufferOffset = Package::package(Reader::mainBuffer, config::bufferSize - sizeLeft);
+
+    if (Reader::mainBufferOffset > 0) {
+        std::copy(Reader::mainBuffer + (config::bufferSize - sizeLeft - Reader::mainBufferOffset),
+                  Reader::mainBuffer + (config::bufferSize - sizeLeft), Reader::mainBuffer);
+    }
+    // std::cout.write(mainBuffer, config::bufferSize - sizeLeft);
+    return true;
 }
