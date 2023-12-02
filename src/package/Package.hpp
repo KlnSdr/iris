@@ -5,6 +5,10 @@
 #ifndef IRIS_PACKAGE_HPP
 #define IRIS_PACKAGE_HPP
 
+#include "../controlChars/controlCharDef.hpp"
+#include "../config/config.hpp"
+#include <iostream>
+#include <iomanip>
 
 class Package {
 public:
