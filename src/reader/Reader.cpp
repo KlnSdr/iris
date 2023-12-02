@@ -1,12 +1,7 @@
-//
-// Created by kilian on 29.11.23.
-//
-
 #include "Reader.hpp"
 
 void Reader::read() {
     char mainBuffer[config::bufferSize];
-    char smolBuffer[config::bufferSize / 2 + 1];
     unsigned int mainBufferOffset = 0;
 
     while (io::hasData()) {
@@ -17,10 +12,10 @@ void Reader::read() {
 
         if (mainBufferOffset > 0) {
             std::copy(mainBuffer + (config::bufferSize - sizeLeft - mainBufferOffset),
-                      mainBuffer + (config::bufferSize - sizeLeft), smolBuffer);
+                      mainBuffer + (config::bufferSize - sizeLeft), mainBuffer);
         }
 
-        std::cout.write(mainBuffer, config::bufferSize - sizeLeft);
+        // std::cout.write(mainBuffer, config::bufferSize - sizeLeft);
     }
 
 }

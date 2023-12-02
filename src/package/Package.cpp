@@ -1,12 +1,11 @@
-//
-// Created by kilian on 29.11.23.
-//
-
 #include "Package.hpp"
 
 unsigned int Package::package(char *buffer, unsigned int size) {
-    // reserve double the max buffer to save nibbles instead of bytes
+    // reserve double the max buffer to store nibbles instead of bytes
+    const unsigned int tmpBufferSize = 4;
     char sendBuffer[config::bufferSize * 2];
+    char tmpBuffer[tmpBufferSize];
+    unsigned int tmpBufferIndex = 0;
     unsigned int sendBufferIndex = 0;
     char lastNibble = 0;
 
@@ -17,39 +16,46 @@ unsigned int Package::package(char *buffer, unsigned int size) {
         char rightNibble = currentChar & 0xF;
 
         if (leftNibble == control::esc1 || leftNibble == control::packageEnd || leftNibble == control::transmissionEnd) {
-            sendBuffer[sendBufferIndex] = control::esc2;
-            sendBufferIndex++;
+            tmpBuffer[tmpBufferIndex] = control::esc2;
+            tmpBufferIndex++;
         } else if (leftNibble == control::esc2 || leftNibble == lastNibble) {
             leftNibble = ~leftNibble & 0xF;
             if (leftNibble == control::esc1) {
-                sendBuffer[sendBufferIndex] = control::esc2;
+                tmpBuffer[tmpBufferIndex] = control::esc2;
                 leftNibble = ~leftNibble & 0xF;
             } else {
-                sendBuffer[sendBufferIndex] = control::esc1;
+                tmpBuffer[tmpBufferIndex] = control::esc1;
             }
-            sendBufferIndex++;
+            tmpBufferIndex++;
         }
-        sendBuffer[sendBufferIndex] = leftNibble;
-        sendBufferIndex++;
+        tmpBuffer[tmpBufferIndex] = leftNibble;
+        tmpBufferIndex++;
 
         // todo condense this as its the same as above
         if (rightNibble == control::esc1 || rightNibble == control::packageEnd || rightNibble == control::transmissionEnd) {
-            sendBuffer[sendBufferIndex] = control::esc2;
-            sendBufferIndex++;
+            tmpBuffer[tmpBufferIndex] = control::esc2;
+            tmpBufferIndex++;
         } else if (rightNibble == control::esc2 || rightNibble == leftNibble) {
             rightNibble = ~rightNibble & 0xF;
             if (rightNibble == control::esc1) {
-                sendBuffer[sendBufferIndex] = control::esc2;
+                tmpBuffer[tmpBufferIndex] = control::esc2;
                 rightNibble = ~rightNibble & 0xF;
             } else {
-                sendBuffer[sendBufferIndex] = control::esc1;
+                tmpBuffer[tmpBufferIndex] = control::esc1;
             }
-            sendBufferIndex++;
+            tmpBufferIndex++;
         }
-        sendBuffer[sendBufferIndex] = rightNibble;
-        sendBufferIndex++;
+        tmpBuffer[tmpBufferIndex] = rightNibble;
+        tmpBufferIndex++;
         lastNibble = rightNibble;
 
+        if (tmpBufferIndex <= size) {
+            std::copy(tmpBuffer, tmpBuffer + tmpBufferIndex, sendBuffer + sendBufferIndex);
+            sendBufferIndex += tmpBufferIndex;
+            tmpBufferIndex = 0;
+        } else {
+            return size;
+        }
 
         std::cout << "leftNibble: " << std::hex << leftNibble << "\n";
         std::cout << "rightNibble: " << std::hex << rightNibble << "\n";
