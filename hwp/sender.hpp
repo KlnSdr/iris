@@ -4,6 +4,7 @@
 #include <array>
 #include <vector>
 #include <string>
+#include "helper.hpp"
 
 class Sender {
     public:
@@ -22,4 +23,5 @@ class Sender {
         static char lastNibble;
         static std::vector<char> data;
         static std::string rawData;
+        static int checkSumme;
 };

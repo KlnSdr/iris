@@ -21,13 +21,13 @@ int main() {
 
     while(1) {
         Reader::read(drv);
-        drv.delay_ms(freq);
+        // drv.delay_ms(freq);
 
         // write
         Sender::send(drv);
         
         //read
         Reader::read(drv);
-        drv.delay_ms(freq);
+        // drv.delay_ms(freq);
     }
 }

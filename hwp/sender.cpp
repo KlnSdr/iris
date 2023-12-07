@@ -7,6 +7,7 @@ const char Sender::ESC2 = 0xD;
 // char Sender::let[11] = {'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd'};
 std::string Sender::rawData = "";
 int Sender::index = 0;
+int Sender::checkSumme = 0;
 char Sender::lastNibble = BEGIN;
 std::vector<char> Sender::data = {};
 
@@ -17,29 +18,30 @@ void Sender::sendNibble(char value, B15F& drv) {
     // std::cout << "+" << std::hex << static_cast<int>(value) << std::endl;
 }
 
-void Sender::setDataBuffer(std::string newData) {
+void Sender::setDataBuffer(std::string newData){
     rawData = newData;
     preprocess();
 }
 
 void Sender::preprocess() {
-    for (int i = 0; i < 5; i++) {
-        data.push_back(1);
-    }
-
+    data.push_back(0);
     data.push_back(BEGIN);
 
+    checkSumme = Helper::calcChecksum(rawData);
+    std::cout << "Checksumme: "  << checkSumme << std::endl;
+    rawData.push_back((char) (checkSumme & 0xFF));
+
     for (int i = 0; i < rawData.length(); i++) {
-        int leftNibble = (int)rawData[i] >> 4;
-        int rightNibble = (int)rawData[i] & 0x0F;
+        char leftNibble = (char)rawData[i] >> 4;
+        char rightNibble = (char)rawData[i] & 0x0F;
 
         if (leftNibble == ESC || leftNibble == END) {
             data.push_back(ESC2);
         } else if (leftNibble == ESC2 || leftNibble == lastNibble) {
-            leftNibble = (~leftNibble) & 0xF;
+            leftNibble = (~leftNibble) & 0x0F;
             if (leftNibble == ESC) {
                 data.push_back(ESC2);
-                leftNibble = (~leftNibble) & 0xF;
+                leftNibble = (~leftNibble) & 0x0F;
             } else {
                 data.push_back(ESC);
             }
@@ -50,10 +52,10 @@ void Sender::preprocess() {
         if (rightNibble == ESC || rightNibble == END) {
             data.push_back(ESC2);
         } else if (rightNibble == ESC2 || rightNibble == leftNibble) {
-            rightNibble = (~rightNibble) & 0xF;
+            rightNibble = (~rightNibble) & 0x0F;
             if (rightNibble == ESC) {
                 data.push_back(ESC2);
-                rightNibble = (~rightNibble) & 0xF;
+                rightNibble = (~rightNibble) & 0x0F;
             } else {
                 data.push_back(ESC);
             }
@@ -62,7 +64,16 @@ void Sender::preprocess() {
 
         lastNibble = rightNibble;
     }
-    data.push_back(END);
+    if (lastNibble == END) {
+        data.push_back(ESC);
+        data.push_back((~END) & 0x0F);
+    } else {
+        data.push_back(END);
+    }
+
+    for (int i = 0; i < data.size(); i++) {
+        std::cout << std::hex << (int) data.at(i) << std::endl;
+    }
 }
 
 void Sender::reset(B15F& drv) {

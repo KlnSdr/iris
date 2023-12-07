@@ -1,6 +1,9 @@
 #include <iostream>
 #include <b15f/b15f.h>
 #include <iomanip>
+#include <vector>
+#include <string>
+#include "helper.hpp"
 
 class Reader{
 public:
@@ -21,4 +24,7 @@ private:
     static int pause;
     static int compareWert;
     static char normalizeReading(char rawRead);
+    static int checkSumsize;
+    static std::vector<char> dataBuffer;
+    static void calculateCheckSumAndPrint();
 };
