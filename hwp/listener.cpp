@@ -15,26 +15,27 @@ bool Reader::wasNull = true;
 int Reader::pause = 0;
 int Reader::compareWert = 0;
 int Reader::checkSumsize = 1;
+const char Reader::OK = 0x9;
+const char Reader::RESEND = 0xE;
 std::vector<char> Reader::dataBuffer = {};
 
 char Reader::normalizeReading(char rawRead) {
     char normalized = 0;
-    char shifted = rawRead >> 4;
 
     for (int i = 0; i < 4; i++) {
-        char lsb = shifted & 0x1;
+        char lsb = rawRead & 0x1;
         lsb <<= 3 - i;
         normalized |= lsb;
-        shifted >>= 1;
+        rawRead >>= 1;
     }
 
     return normalized;
 }
 
-void Reader::calculateCheckSumAndPrint() {
+bool Reader::calculateCheckSumAndPrint() {
     if (dataBuffer.size() < checkSumsize) {
         std::cout << "[verworfen: zu kurz]" << std::endl;
-        return;
+        return false;
     }
     // std::cout << "======" << std::endl;
     // for (int i = 0; i < dataBuffer.size(); i++) {
@@ -55,8 +56,10 @@ void Reader::calculateCheckSumAndPrint() {
     int calcedCheckSum = Helper::calcChecksum(dataBufferString);
 
     // std::cout << "calced " << calcedCheckSum << " == " << "read " << checkSum << "?" << std::endl;
+    
+    bool isValidPackage = calcedCheckSum == checkSum;
 
-    if (calcedCheckSum == checkSum) {
+    if (isValidPackage) {
         // std::cout << "gleich" << std::endl;
         std::cout << dataBufferString << std::endl;
     } else {
@@ -66,11 +69,38 @@ void Reader::calculateCheckSumAndPrint() {
 
     dataBuffer.clear();
     // std::cout << "======" << std::endl;
+    return isValidPackage;
 }
 
-void Reader::read(B15F& drv) {
-		
-    char value = normalizeReading((char) drv.getRegister(&PINA));
+void Reader::read(B15F& drv, int channel, bool isPrimaryRead) {
+    char rawValue = (char) drv.getRegister(&PINA);
+    char value;
+
+    if (channel == Config::CHANNEL_A) {
+        value = rawValue & 0xF;
+    } else {
+        value = rawValue >> 4;
+    }
+
+    value = normalizeReading(value);
+
+    if (!isPrimaryRead) {
+        if (value == OK || value == RESEND) {
+            Config::everythingIsOkiDoki = value == OK;
+            
+            if (channel == Config::CHANNEL_A) {
+                Config::a_isWrite = true;
+                Helper::setChannel(channel, true, drv);
+            } else {
+                Config::b_isWrite = true;
+                Helper::setChannel(channel, true, drv);
+            }
+        }
+        // todo timer falls lange kein richtiges zeichen anliegt
+
+        return;
+    }
+
     if (compareWert == value){
         pause++;
         return;
@@ -120,7 +150,18 @@ void Reader::read(B15F& drv) {
         beginbool = false;
         buffer = 0;
         offset = 0;
-        calculateCheckSumAndPrint();
+
+        bool isValidPackage = calculateCheckSumAndPrint();
+        Config::checkSumIsFOCKINGtheSame = isValidPackage;
+
+        if (channel == Config::CHANNEL_A) {
+            Config::a_isWrite = true;
+            Helper::setChannel(channel, true, drv);
+        } else {
+            Config::b_isWrite = true;
+            Helper::setChannel(channel, true, drv);
+        }
+
         // std::cout << std::endl;
         // std::cout << "=== end ===" << std::endl;
     }
