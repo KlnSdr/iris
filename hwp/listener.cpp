@@ -72,7 +72,7 @@ bool Reader::calculateCheckSumAndPrint() {
     return isValidPackage;
 }
 
-void Reader::read(B15F& drv, int channel, bool isPrimaryRead) {
+void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
     char rawValue = (char) drv.getRegister(&PINA);
     char value;
 
@@ -84,7 +84,7 @@ void Reader::read(B15F& drv, int channel, bool isPrimaryRead) {
 
     value = normalizeReading(value);
 
-    if (!isPrimaryRead) {
+    if (isPrimarySend) {
         if (value == OK || value == RESEND) {
             Config::everythingIsOkiDoki = value == OK;
             
