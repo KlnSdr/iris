@@ -1,7 +1,7 @@
-#include "config/config.hpp"
+#include "config/Config.hpp"
 
 int main() {
-    config::setup();
+    Config::setup();
     // code
     return 0;
 }

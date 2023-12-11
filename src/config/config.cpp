@@ -1,8 +1,10 @@
-#include "config.hpp"
+#include "Config.hpp"
 
-const std::vector<int> config::Tx = {0, 1, 2, 3};
-const std::vector<int> config::Rx = {4, 5, 6, 7};
-
-void config::setup() {
+void Config::setup() {
     std::ios::sync_with_stdio(false);
 }
+bool Config::a_isWrite = Config::a_primarySend;
+bool Config::b_isWrite = !Config::a_primarySend;
+
+bool Config::checkSumIsFOCKINGtheSame = false;
+bool Config::everythingIsOkiDoki = false;
