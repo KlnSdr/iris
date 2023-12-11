@@ -14,10 +14,23 @@ void initDataBuffer() {
     Sender::setDataBuffer(value);
 }
 
+void printBanner() {
+   std::cerr << "#### ########  ####  ######" << std::endl;
+   std::cerr << " ##  ##     ##  ##  ##    ##" << std::endl;
+   std::cerr << " ##  ##     ##  ##  ##" << std::endl;
+   std::cerr << " ##  ########   ##   ######" << std::endl;
+   std::cerr << " ##  ##   ##    ##        ##" << std::endl;
+   std::cerr << " ##  ##    ##   ##  ##    ##" << std::endl;
+   std::cerr << "#### ##     ## ####  ######" << std::endl;
+   std::cerr << std::endl;
+}
+
 int main() {
+    printBanner();
     Logger::setLogLevel(Logger::LogLevel::DEBUG);
     Config::setup();
     initDataBuffer();
+    return 0;
 
     B15F& drv = B15F::getInstance();
 

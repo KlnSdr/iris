@@ -160,7 +160,7 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
         esc2bool = false;
     }
     
-    Logger::debug("begin: " + std::to_string(beginbool) + "  End: " + std::to_string(endbool) + "  esc2:  " + std::to_string(esc2bool) + "  esc:   " + std::to_string(escbool);
+    Logger::debug("begin: " + std::to_string(beginbool) + "  End: " + std::to_string(endbool) + "  esc2:  " + std::to_string(esc2bool) + "  esc:   " + std::to_string(escbool));
     if (beginbool == true && endbool == false && esc2bool == false && escbool == false) {
     
         buffer <<= offset;
