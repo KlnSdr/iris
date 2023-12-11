@@ -4,6 +4,7 @@
 #include <iostream>
 #include "config/Config.hpp"
 #include "helper/Helper.hpp"
+#include "logger/Logger.hpp"
 
 const int freq = 1;
 
@@ -14,6 +15,7 @@ void initDataBuffer() {
 }
 
 int main() {
+    Logger::setLogLevel(Logger::LogLevel::DEBUG);
     Config::setup();
     initDataBuffer();
 

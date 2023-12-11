@@ -16,3 +16,10 @@ void Helper::setChannel(int channel, bool isWrite, B15F &drv) {
         drv.setRegister(&DDRA, value & ~channel);
     }
 }
+
+std::string Helper::charToHex(char chr) {
+    std::stringstream ss;
+    ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(chr);
+    std::string hexString = ss.str();
+    return hexString;
+}

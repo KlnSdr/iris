@@ -35,7 +35,7 @@ bool SimClient::writePins(const std::vector<int> &pins, const std::vector<bool> 
     }
 
     if (pins.size() != values.size()) {
-        std::cout << "Error: pins and values must be the same size.\n";
+        Logger::error("pins and values must be the same size.");
         return false;
     }
 
@@ -60,7 +60,7 @@ bool SimClient::writePins(const std::vector<int> &pins, const std::vector<bool> 
         close(SimClient::client_fd);
         return false;
     } else if (bytes_read == 0) {
-        std::cout << "Server closed the connection.\n";
+        Logger::info("Server closed the connection.");
         SimClient::isConnected = false;
         return false;
     }
@@ -98,7 +98,7 @@ std::vector<bool> SimClient::readPins(const std::vector<int> &pins) {
         close(SimClient::client_fd);
         return result;
     } else if (bytes_read == 0) {
-        std::cout << "Server closed the connection.\n";
+        Logger::info("Server closed the connection.");
         SimClient::isConnected = false;
         return result;
     }
@@ -115,7 +115,7 @@ std::vector<bool> SimClient::readPins(const std::vector<int> &pins) {
             }
         }
     } else {
-        std::cout << "Unknown command: " << buffer << "\n";
+        Logger::error("Unknown command: " + std::string(buffer));
     }
     return result;
 }

@@ -8,10 +8,8 @@ char Sender::lastNibble = ControlChars::PCK_START;
 std::vector<char> Sender::data = {};
 
 void Sender::sendNibble(char value, B15F& drv, int channel) {
-    // drv.setRegister(&PORTA, (PORTA & 0xF0) | (value & 0x0F));
     drv.setRegister(&PORTA, (value | (value << 4)) & channel);
-    // drv.delay_ms(500);
-    // std::cout << "+" << std::hex << static_cast<int>(value) << std::endl;
+    Logger::debug("write to channel " + std::to_string(channel) + ": " + Helper::charToHex(value));
 }
 
 void Sender::setDataBuffer(std::string newData){
@@ -26,7 +24,7 @@ void Sender::preprocess() {
     data.push_back(ControlChars::PCK_START);
 
     checkSumme = Helper::calcChecksum(rawData);
-    std::cout << "Checksumme: "  << checkSumme << std::endl;
+    Logger::debug("Checksumme: "  + std::to_string(checkSumme));
     rawData.push_back((char) (checkSumme & 0xFF));
 
     for (int i = 0; i < rawData.length(); i++) {
@@ -70,7 +68,7 @@ void Sender::preprocess() {
     }
 
     for (int i = 0; i < data.size(); i++) {
-        std::cout << std::hex << (int) data.at(i) << std::endl;
+        Logger::debug(Helper::charToHex(data.at(i)));
     }
 }
 

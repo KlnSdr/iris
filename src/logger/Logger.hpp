@@ -6,7 +6,6 @@
 #define IRIS_LOGGER_HPP
 
 #include <iostream>
-#include <ctime>
 
 class Logger {
 public:

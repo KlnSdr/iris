@@ -7,6 +7,7 @@
 #include "../helper/Helper.hpp"
 #include "../config/Config.hpp"
 #include "../controlChars/ControlCharDef.hpp"
+#include "../logger/Logger.hpp"
 
 class Sender {
     public:

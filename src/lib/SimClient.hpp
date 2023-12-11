@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <vector>
 #include <sstream>
+#include "../logger/Logger.hpp"
 
 class SimClient {
 public:

@@ -26,41 +26,40 @@ char Reader::normalizeReading(char rawRead) {
 
 bool Reader::calculateCheckSumAndPrint() {
     if (dataBuffer.size() < checkSumsize) {
-        std::cout << "[verworfen: zu kurz]" << std::endl;
+        Logger::info("verworfen: zu kurz");
         return false;
     }
-    // std::cout << "======" << std::endl;
-    // for (int i = 0; i < dataBuffer.size(); i++) {
-        // std::cout << std::hex << dataBuffer.at(i) << std::endl;
-    // }
-    // std::cout << "-" << std::endl;
+    Logger::debug("=======");
+    for (int i = 0; i < dataBuffer.size(); i++) {
+        Logger::debug(Helper::charToHex(dataBuffer.at(i)));
+    }
+    Logger::debug("---");
     int checkSum = 0;
 
     for (int i = 0; i < checkSumsize; i++) {
         int checksumByte = dataBuffer.at(dataBuffer.size() - i - 1) & 0xFF;
         checkSum += checksumByte << i;
-        // std::cout << std::hex << checksumByte;
+        Logger::debug(Helper::charToHex(checksumByte));
     }
-    // std::cout << std::endl;
     dataBuffer.resize(dataBuffer.size() - checkSumsize);
 
     std::string dataBufferString(dataBuffer.begin(), dataBuffer.end());
     int calcedCheckSum = Helper::calcChecksum(dataBufferString);
 
-    // std::cout << "calced " << calcedCheckSum << " == " << "read " << checkSum << "?" << std::endl;
+    Logger::debug("calced " + std::to_string(calcedCheckSum) + " == read " + std::to_string(checkSum) + "?" );
     
     bool isValidPackage = calcedCheckSum == checkSum;
 
     if (isValidPackage) {
-        // std::cout << "gleich" << std::endl;
+        Logger::debug("gleich");
         std::cout << dataBufferString << std::endl;
     } else {
-        // std::cout << "fuck" << std::endl;
-        std::cout << "[verworfen]" << std::endl;
+        Logger::debug("nicht gleich");
+        Logger::info("verworfen, weil crc falsch");
     }
 
     dataBuffer.clear();
-    // std::cout << "======" << std::endl;
+    Logger::debug("======");
     return isValidPackage;
 }
 
@@ -107,11 +106,11 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
     pause = 0;
     compareWert = value;
 
-     // std::cout << "gelesener Hex: " << std::hex << (int) value << std::endl;
+     Logger::debug("gelesener Hex: " + Helper::charToHex(value));
 
     if (escbool == true) {
         value = (~value) & 0xF;
-        // std::cout << "inv " << std::hex << (int) value << std::endl;
+        Logger::debug("inv " + Helper::charToHex(value));
         escbool = false;
     }
 
@@ -124,7 +123,7 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
     }
 
     if(value == ControlChars::PCK_START && beginbool == false){
-        // std::cout << "=== begin ===" << std::endl;
+        Logger::debug("=== begin ===");
         beginbool = true;
         endbool = false;
         escbool = false;
@@ -154,27 +153,25 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
             Helper::setChannel(channel, true, drv);
         }
 
-        // std::cout << std::endl;
-        // std::cout << "=== end ===" << std::endl;
+        Logger::debug("=== end ===");
     }
 
     if (esc2bool == true && value != ControlChars::ESC2) {
         esc2bool = false;
     }
     
-    // std::cout << "begin: " << beginbool << "  End: " << endbool << "  esc2:  " << esc2bool << "  esc:   " << escbool << std::endl;
+    Logger::debug("begin: " + std::to_string(beginbool) + "  End: " + std::to_string(endbool) + "  esc2:  " + std::to_string(esc2bool) + "  esc:   " + std::to_string(escbool);
     if (beginbool == true && endbool == false && esc2bool == false && escbool == false) {
     
         buffer <<= offset;
-        // std::cout << "add to buffer: " << std::hex << (int) value << std::endl;
+        Logger::debug("add to buffer: " + Helper::charToHex(value));
         buffer += value;
         offset += 4;
 
         if (offset > 4){
-            // std::cout << static_cast<char>(buffer) << std::flush;
+            Logger::debug("add to data buffer: " + Helper::charToHex(buffer));
             dataBuffer.push_back(buffer);
-            // std::cout << std::hex << static_cast<int>(buffer) << std::flush;
-            // std::cout << "neuer Char:    " << std::hex << (int) buffer << " -> " << static_cast<char>(buffer) << std::endl;
+            Logger::debug("neuer Char:    " + Helper::charToHex(buffer) + " -> " + std::to_string(static_cast<char>(buffer)));
             offset = 0;
             buffer = 0;
         }
