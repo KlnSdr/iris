@@ -2,12 +2,10 @@
 
 bool Reader::escbool = false;
 bool Reader::esc2bool = false;
-int Reader::beginzaehler = 1;
 bool Reader::beginbool= false;
 bool Reader::endbool = false;
 int Reader::buffer = 0;
 int Reader::offset = 0;
-bool Reader::wasNull = true;
 int Reader::pause = 0;
 int Reader::compareWert = 0;
 int Reader::checkSumsize = 1;
@@ -171,7 +169,6 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
         // std::cout << "add to buffer: " << std::hex << (int) value << std::endl;
         buffer += value;
         offset += 4;
-        wasNull = false;
 
         if (offset > 4){
             // std::cout << static_cast<char>(buffer) << std::flush;

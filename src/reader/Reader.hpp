@@ -13,12 +13,10 @@ public:
 private:
     static bool escbool;
     static bool esc2bool;
-    static int beginzaehler;
     static bool  beginbool;
     static bool endbool;
     static int buffer;
     static int offset;
-    static bool wasNull;
     static int pause;
     static int compareWert;
     static char normalizeReading(char rawRead);

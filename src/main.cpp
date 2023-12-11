@@ -14,6 +14,7 @@ void initDataBuffer() {
 }
 
 int main() {
+    Config::setup();
     initDataBuffer();
 
     B15F& drv = B15F::getInstance();

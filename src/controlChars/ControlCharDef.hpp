@@ -1,3 +1,5 @@
+#pragma once
+
 enum ControlChars{
     PCK_START = 0x05,
     PCK_END = 0x07,
