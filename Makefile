@@ -7,7 +7,7 @@ CXX := g++
 CXXFLAGS := -std=c++17 -Wall
 
 # Debug flags
-DEBUGFLAGS := -g -O0
+DEBUGFLAGS := -g -O3
 
 # Directories
 SRCDIR := src
@@ -25,12 +25,12 @@ TARGET := $(BINDIR)/iris.bin
 
 # Compile rule
 $(TARGET): $(OBJ)
-	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) -o $@ $^
+	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) -o $@ $^ -lb15fdrv
 
 # Object file rule
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) -c -o $@ $< -lb15fdrv
 
 # Phony target to clean the project
 .PHONY: clean
