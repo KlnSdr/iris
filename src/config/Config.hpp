@@ -12,6 +12,8 @@ public:
     static const int CHANNEL_A = 0x0F;
     static const int CHANNEL_B = 0xF0;
 
+    static const int bufferSize = 256;
+
     static const bool a_primarySend = true;
     static const Logger::LogLevel logLevel = Logger::LogLevel::DEBUG;
 

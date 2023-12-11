@@ -4,12 +4,15 @@
 #include <iostream>
 #include "config/Config.hpp"
 #include "helper/Helper.hpp"
+#include "io/IO.hpp"
 
 const int freq = 1;
 
 void initDataBuffer() {
-    std::string value;
-    std::getline(std::cin, value);
+    char buffer[Config::bufferSize];
+    unsigned int written = IO::readBuffer(buffer, Config::bufferSize);
+
+    std::string value = std::string(buffer, Config::bufferSize - written);
     Sender::setDataBuffer(value);
 }
 
