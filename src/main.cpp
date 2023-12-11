@@ -1,6 +1,6 @@
 #include <b15f/b15f.h>
 #include "reader/Reader.hpp"
-#include "sender/sender.hpp"
+#include "sender/Sender.hpp"
 #include <iostream>
 #include "config/Config.hpp"
 #include "helper/Helper.hpp"

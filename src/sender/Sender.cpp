@@ -1,4 +1,4 @@
-#include "sender.hpp"
+#include "Sender.hpp"
 
 const char Sender::ESC = 0xA;
 const char Sender::BEGIN = 0x5;
