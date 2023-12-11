@@ -1,13 +1,9 @@
 #include "Reader.hpp"
 
-const char Reader::esc = 0x0A;
 bool Reader::escbool = false;
-const char Reader::esc2 = 0x0D;
 bool Reader::esc2bool = false;
 int Reader::beginzaehler = 1;
-const char Reader::begin = 0x05;
 bool Reader::beginbool= false;
-const char Reader::end = 0x07;
 bool Reader::endbool = false;
 int Reader::buffer = 0;
 int Reader::offset = 0;
@@ -15,8 +11,6 @@ bool Reader::wasNull = true;
 int Reader::pause = 0;
 int Reader::compareWert = 0;
 int Reader::checkSumsize = 1;
-const char Reader::OK = 0x9;
-const char Reader::RESEND = 0xE;
 std::vector<char> Reader::dataBuffer = {};
 
 char Reader::normalizeReading(char rawRead) {
@@ -85,8 +79,8 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
     value = normalizeReading(value);
 
     if (isPrimarySend) {
-        if (value == OK || value == RESEND) {
-            Config::everythingIsOkiDoki = value == OK;
+        if (value == ControlChars::OK || value == ControlChars::RESEND) {
+            Config::everythingIsOkiDoki = value == ControlChars::OK;
             
             if (channel == Config::CHANNEL_A) {
                 Config::a_isWrite = true;
@@ -123,15 +117,15 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
         escbool = false;
     }
 
-    if (value == esc2 && compareWert == value){
+    if (value == ControlChars::ESC2 && compareWert == value){
         esc2bool = true;
     }
 
-    if (value == esc && esc2bool == false) {
+    if (value == ControlChars::ESC1 && esc2bool == false) {
         escbool = true;
     }
 
-    if(value == begin && beginbool == false){
+    if(value == ControlChars::PCK_START && beginbool == false){
         // std::cout << "=== begin ===" << std::endl;
         beginbool = true;
         endbool = false;
@@ -141,11 +135,11 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
     }
     
     
-    if(value == end && esc2bool == true){
+    if(value == ControlChars::PCK_END && esc2bool == true){
         endbool = false;
         esc2bool = false;
         
-    } else if(value == end && esc2bool == false){
+    } else if(value == ControlChars::PCK_END && esc2bool == false){
         endbool = true;
         beginbool = false;
         buffer = 0;
@@ -166,7 +160,7 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
         // std::cout << "=== end ===" << std::endl;
     }
 
-    if (esc2bool == true && value != esc2) {
+    if (esc2bool == true && value != ControlChars::ESC2) {
         esc2bool = false;
     }
     

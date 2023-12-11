@@ -1,5 +1,8 @@
-enum control {packageStart = 0x09, packageEnd = 0x0A,transmissionEnd = 0x0B,acknowledge = 0x0D,resend = 0x0E,esc1 = 0x07,esc2 = 0x05};
-
-
-
-
+enum ControlChars{
+    PCK_START = 0x05,
+    PCK_END = 0x07,
+    OK = 0x09,
+    RESEND = 0x0E,
+    ESC1 = 0x0A,
+    ESC2 = 0x0D
+};

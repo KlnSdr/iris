@@ -6,6 +6,7 @@
 #include <string>
 #include "../helper/Helper.hpp"
 #include "../config/Config.hpp"
+#include "../controlChars/ControlCharDef.hpp"
 
 class Sender {
     public:
@@ -15,12 +16,6 @@ class Sender {
     private:
         static void sendNibble(char value, B15F& drv, int channel);
         static void preprocess();
-        static const char ESC;
-        static const char BEGIN;
-        static const char END;
-        static const char ESC2;
-        static const char OK;
-        static const char RESEND;
         // static char let[11];
         static int index;
         static char lastNibble;

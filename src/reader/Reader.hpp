@@ -5,22 +5,17 @@
 #include <string>
 #include "../helper/Helper.hpp"
 #include "../config/Config.hpp"
+#include "../controlChars/ControlCharDef.hpp"
 
 class Reader{
 public:
     static void read(B15F& drv, int channel, bool isPrimaryRead);
 private:
-    static const char esc;
     static bool escbool;
-    static const char esc2;
     static bool esc2bool;
     static int beginzaehler;
-    static const char begin;
     static bool  beginbool;
-    static const char end;
     static bool endbool;
-    static const char OK;
-    static const char RESEND;
     static int buffer;
     static int offset;
     static bool wasNull;
