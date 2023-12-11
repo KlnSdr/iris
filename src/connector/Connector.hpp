@@ -6,9 +6,9 @@
 
 class Connector {
 public:
-    virtual std::vector<bool> readPins() = 0;
+    virtual char readPins() = 0;
 
-    virtual void writePins(std::vector<bool> values) = 0;
+    virtual void writePins(char value) = 0;
 
     virtual void wait() = 0;
 
