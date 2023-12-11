@@ -11,6 +11,20 @@ int Reader::compareWert = 0;
 int Reader::checkSumsize = 1;
 std::vector<char> Reader::dataBuffer = {};
 
+/**
+ * @brief Calculates the checksum of the data buffer and prints it.
+ *
+ * This method calculates the checksum of the data buffer and compares it with the checksum read from the data buffer.
+ * If the data buffer is shorter than the checksum size, an info message is logged and the method returns false.
+ * The checksum is calculated by summing up the values of the checksum bytes in the data buffer.
+ * The checksum bytes are the last bytes in the data buffer, with the number of bytes being determined by the checksum size.
+ * The calculated checksum is then compared with the checksum read from the data buffer.
+ * If the calculated checksum and the read checksum are equal, a debug message is logged, the data buffer is printed to the standard output, and the method returns true.
+ * If the calculated checksum and the read checksum are not equal, a debug message and an info message are logged and the method returns false.
+ * Regardless of the result, the data buffer is cleared at the end of the method.
+ *
+ * @return A bool indicating whether the calculated checksum and the read checksum are equal. Returns true if the checksums are equal, false otherwise.
+ */
 bool Reader::calculateCheckSumAndPrint() {
     if (dataBuffer.size() < checkSumsize) {
         Logger::info("verworfen: zu kurz");
@@ -50,6 +64,26 @@ bool Reader::calculateCheckSumAndPrint() {
     return isValidPackage;
 }
 
+/**
+ * @brief Reads data from a specified channel and processes it.
+ *
+ * This method reads data from a specified channel and processes it according to the communication protocol.
+ * If the isPrimarySend parameter is true, the method checks if the read value is an acknowledgement or resend request.
+ * If the read value is an acknowledgement, the everythingIsOkiDoki static member of the Config class is set to true.
+ * If the read value is a resend request, the everythingIsOkiDoki static member of the Config class is set to false.
+ * The method then sets the direction of the specified channel to output mode.
+ * If the isPrimarySend parameter is false, the method processes the read value according to the communication protocol.
+ * The method checks for control characters and handles them accordingly.
+ * If the read value is a start of packet character, the method sets the beginbool static member to true and the endbool static member to false.
+ * If the read value is an end of packet character, the method sets the endbool static member to true and the beginbool static member to false.
+ * The method then calculates the checksum of the data buffer and prints it.
+ * If the calculated checksum and the read checksum are equal, the checkSumIsFOCKINGtheSame static member of the Config class is set to true.
+ * The method then sets the direction of the specified channel to output mode.
+ * If the read value is not a control character, the method adds it to the data buffer.
+ *
+ * @param channel The channel to read from. This should be an int representing the channel.
+ * @param isPrimarySend A boolean indicating whether the method should check for an acknowledgement or resend request. If true, the method checks for an acknowledgement or resend request. If false, the method processes the read value according to the communication protocol.
+ */
 void Reader::read(int channel, bool isPrimarySend) {
     char value = Connector::getInstance().readChannel(channel);
 
@@ -165,5 +199,3 @@ void Reader::read(int channel, bool isPrimarySend) {
     }
 
 }
-
-
