@@ -1,7 +1,3 @@
-//
-// Created by kilian on 11.12.23.
-//
-
 #include "Logger.hpp"
 
 Logger::LogLevel Logger::logLevel = LogLevel::INFO;

@@ -1,7 +1,3 @@
-//
-// Created by kilian on 11.12.23.
-//
-
 #ifndef IRIS_LOGGER_HPP
 #define IRIS_LOGGER_HPP
 

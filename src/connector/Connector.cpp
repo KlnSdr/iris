@@ -1,7 +1,3 @@
-//
-// Created by kilian on 11.12.23.
-//
-
 #include "Connector.hpp"
 
 char Connector::readChannel(int channel) {
