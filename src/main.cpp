@@ -15,24 +15,22 @@ void initDataBuffer() {
 }
 
 void printBanner() {
-   std::cerr << "#### ########  ####  ######" << std::endl;
-   std::cerr << " ##  ##     ##  ##  ##    ##" << std::endl;
-   std::cerr << " ##  ##     ##  ##  ##" << std::endl;
-   std::cerr << " ##  ########   ##   ######" << std::endl;
-   std::cerr << " ##  ##   ##    ##        ##" << std::endl;
-   std::cerr << " ##  ##    ##   ##  ##    ##" << std::endl;
-   std::cerr << "#### ##     ## ####  ######" << std::endl;
-   std::cerr << std::endl;
+    std::cerr << "#### ########  ####  ######" << std::endl;
+    std::cerr << " ##  ##     ##  ##  ##    ##" << std::endl;
+    std::cerr << " ##  ##     ##  ##  ##" << std::endl;
+    std::cerr << " ##  ########   ##   ######" << std::endl;
+    std::cerr << " ##  ##   ##    ##        ##" << std::endl;
+    std::cerr << " ##  ##    ##   ##  ##    ##" << std::endl;
+    std::cerr << "#### ##     ## ####  ######" << std::endl;
+    std::cerr << std::endl;
 }
 
 int main() {
     printBanner();
-    Logger::setLogLevel(Logger::LogLevel::DEBUG);
     Config::setup();
     initDataBuffer();
-    return 0;
 
-    B15F& drv = B15F::getInstance();
+    B15F &drv = B15F::getInstance();
 
     Helper::setChannel(Config::CHANNEL_A, Config::a_isWrite, drv);
     Helper::setChannel(Config::CHANNEL_B, Config::b_isWrite, drv);
@@ -40,7 +38,7 @@ int main() {
     Sender::reset(drv, Config::CHANNEL_A);
     // drv.delay_ms(2000);
 
-    while(1) {
+    while (1) {
         if (!Config::a_isWrite) {
             Reader::read(drv, Config::CHANNEL_A, Config::a_primarySend);
         }

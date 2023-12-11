@@ -9,20 +9,22 @@
 
 class Logger {
 public:
-    enum class LogLevel { ERROR, INFO, DEBUG };
+    enum class LogLevel {
+        ERROR, INFO, DEBUG
+    };
 
     static void setLogLevel(LogLevel level);
 
-    static void debug(const std::string& message);
+    static void debug(const std::string &message);
 
-    static void info(const std::string& message);
+    static void info(const std::string &message);
 
-    static void error(const std::string& message);
+    static void error(const std::string &message);
 
 private:
     static LogLevel logLevel;
 
-    static void log(const std::string& level, const std::string& message, LogLevel messageLevel);
+    static void log(const std::string &level, const std::string &message, LogLevel messageLevel);
 };
 
 

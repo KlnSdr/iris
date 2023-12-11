@@ -1,6 +1,6 @@
 #pragma once
 
-enum ControlChars{
+enum ControlChars {
     PCK_START = 0x05,
     PCK_END = 0x07,
     OK = 0x09,

@@ -8,20 +8,24 @@
 #include "../controlChars/ControlCharDef.hpp"
 #include "../logger/Logger.hpp"
 
-class Reader{
+class Reader {
 public:
-    static void read(B15F& drv, int channel, bool isPrimaryRead);
+    static void read(B15F &drv, int channel, bool isPrimaryRead);
+
 private:
     static bool escbool;
     static bool esc2bool;
-    static bool  beginbool;
+    static bool beginbool;
     static bool endbool;
     static int buffer;
     static int offset;
     static int pause;
     static int compareWert;
+
     static char normalizeReading(char rawRead);
+
     static int checkSumsize;
     static std::vector<char> dataBuffer;
+
     static bool calculateCheckSumAndPrint();
 };

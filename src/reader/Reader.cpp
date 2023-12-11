@@ -2,7 +2,7 @@
 
 bool Reader::escbool = false;
 bool Reader::esc2bool = false;
-bool Reader::beginbool= false;
+bool Reader::beginbool = false;
 bool Reader::endbool = false;
 int Reader::buffer = 0;
 int Reader::offset = 0;
@@ -46,8 +46,8 @@ bool Reader::calculateCheckSumAndPrint() {
     std::string dataBufferString(dataBuffer.begin(), dataBuffer.end());
     int calcedCheckSum = Helper::calcChecksum(dataBufferString);
 
-    Logger::debug("calced " + std::to_string(calcedCheckSum) + " == read " + std::to_string(checkSum) + "?" );
-    
+    Logger::debug("calced " + std::to_string(calcedCheckSum) + " == read " + std::to_string(checkSum) + "?");
+
     bool isValidPackage = calcedCheckSum == checkSum;
 
     if (isValidPackage) {
@@ -63,7 +63,7 @@ bool Reader::calculateCheckSumAndPrint() {
     return isValidPackage;
 }
 
-void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
+void Reader::read(B15F &drv, int channel, bool isPrimarySend) {
     char rawValue = (char) drv.getRegister(&PINA);
     char value;
 
@@ -78,7 +78,7 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
     if (isPrimarySend) {
         if (value == ControlChars::OK || value == ControlChars::RESEND) {
             Config::everythingIsOkiDoki = value == ControlChars::OK;
-            
+
             if (channel == Config::CHANNEL_A) {
                 Config::a_isWrite = true;
                 Helper::setChannel(channel, true, drv);
@@ -92,7 +92,7 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
         return;
     }
 
-    if (compareWert == value){
+    if (compareWert == value) {
         pause++;
         return;
     } else if (pause > 20) {
@@ -100,13 +100,13 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
         endbool = true;
         beginbool = false;
         std::cout << std::endl;
-	pause = 0;
+        pause = 0;
         return;
     }
     pause = 0;
     compareWert = value;
 
-     Logger::debug("gelesener Hex: " + Helper::charToHex(value));
+    Logger::debug("gelesener Hex: " + Helper::charToHex(value));
 
     if (escbool == true) {
         value = (~value) & 0xF;
@@ -114,7 +114,7 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
         escbool = false;
     }
 
-    if (value == ControlChars::ESC2 && compareWert == value){
+    if (value == ControlChars::ESC2 && compareWert == value) {
         esc2bool = true;
     }
 
@@ -122,7 +122,7 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
         escbool = true;
     }
 
-    if(value == ControlChars::PCK_START && beginbool == false){
+    if (value == ControlChars::PCK_START && beginbool == false) {
         Logger::debug("=== begin ===");
         beginbool = true;
         endbool = false;
@@ -130,13 +130,13 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
         esc2bool = false;
         return;
     }
-    
-    
-    if(value == ControlChars::PCK_END && esc2bool == true){
+
+
+    if (value == ControlChars::PCK_END && esc2bool == true) {
         endbool = false;
         esc2bool = false;
-        
-    } else if(value == ControlChars::PCK_END && esc2bool == false){
+
+    } else if (value == ControlChars::PCK_END && esc2bool == false) {
         endbool = true;
         beginbool = false;
         buffer = 0;
@@ -159,19 +159,21 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
     if (esc2bool == true && value != ControlChars::ESC2) {
         esc2bool = false;
     }
-    
-    Logger::debug("begin: " + std::to_string(beginbool) + "  End: " + std::to_string(endbool) + "  esc2:  " + std::to_string(esc2bool) + "  esc:   " + std::to_string(escbool));
+
+    Logger::debug("begin: " + std::to_string(beginbool) + "  End: " + std::to_string(endbool) + "  esc2:  " +
+                  std::to_string(esc2bool) + "  esc:   " + std::to_string(escbool));
     if (beginbool == true && endbool == false && esc2bool == false && escbool == false) {
-    
+
         buffer <<= offset;
         Logger::debug("add to buffer: " + Helper::charToHex(value));
         buffer += value;
         offset += 4;
 
-        if (offset > 4){
+        if (offset > 4) {
             Logger::debug("add to data buffer: " + Helper::charToHex(buffer));
             dataBuffer.push_back(buffer);
-            Logger::debug("neuer Char:    " + Helper::charToHex(buffer) + " -> " + std::to_string(static_cast<char>(buffer)));
+            Logger::debug(
+                    "neuer Char:    " + Helper::charToHex(buffer) + " -> " + std::to_string(static_cast<char>(buffer)));
             offset = 0;
             buffer = 0;
         }
@@ -181,7 +183,7 @@ void Reader::read(B15F& drv, int channel, bool isPrimarySend) {
             offset = 0;
             pause = 0;
         }
-    
+
     }
 
 }

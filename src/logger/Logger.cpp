@@ -10,15 +10,15 @@ void Logger::setLogLevel(LogLevel level) {
     logLevel = level;
 }
 
-void Logger::debug(const std::string& message) {
+void Logger::debug(const std::string &message) {
     log("DEBUG", message, LogLevel::DEBUG);
 }
 
-void Logger::info(const std::string& message) {
+void Logger::info(const std::string &message) {
     log("INFO", message, LogLevel::INFO);
 }
 
-void Logger::log(const std::string& level, const std::string& message, LogLevel messageLevel) {
+void Logger::log(const std::string &level, const std::string &message, LogLevel messageLevel) {
     if (messageLevel > logLevel) {
         return;
     }

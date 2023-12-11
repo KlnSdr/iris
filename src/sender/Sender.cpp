@@ -7,29 +7,29 @@ int Sender::checkSumme = 0;
 char Sender::lastNibble = ControlChars::PCK_START;
 std::vector<char> Sender::data = {};
 
-void Sender::sendNibble(char value, B15F& drv, int channel) {
+void Sender::sendNibble(char value, B15F &drv, int channel) {
     drv.setRegister(&PORTA, (value | (value << 4)) & channel);
     Logger::debug("write to channel " + std::to_string(channel) + ": " + Helper::charToHex(value));
 }
 
-void Sender::setDataBuffer(std::string newData){
+void Sender::setDataBuffer(std::string newData) {
     rawData = newData;
     preprocess();
 }
 
 void Sender::preprocess() {
     for (int i = 0; i < 50; i++) {
-       data.push_back(0);
+        data.push_back(0);
     }
     data.push_back(ControlChars::PCK_START);
 
     checkSumme = Helper::calcChecksum(rawData);
-    Logger::debug("Checksumme: "  + std::to_string(checkSumme));
+    Logger::debug("Checksumme: " + std::to_string(checkSumme));
     rawData.push_back((char) (checkSumme & 0xFF));
 
     for (int i = 0; i < rawData.length(); i++) {
-        char leftNibble = (char)rawData[i] >> 4;
-        char rightNibble = (char)rawData[i] & 0x0F;
+        char leftNibble = (char) rawData[i] >> 4;
+        char rightNibble = (char) rawData[i] & 0x0F;
 
         if (leftNibble == ControlChars::ESC1 || leftNibble == ControlChars::PCK_END) {
             data.push_back(ControlChars::ESC2);
@@ -72,11 +72,11 @@ void Sender::preprocess() {
     }
 }
 
-void Sender::reset(B15F& drv, int channel) {
+void Sender::reset(B15F &drv, int channel) {
     sendNibble(0, drv, channel);
 }
 
-void Sender::send(B15F& drv, int channel, bool isPrimarySend) {
+void Sender::send(B15F &drv, int channel, bool isPrimarySend) {
     if (!isPrimarySend) {
         sendNibble(Config::checkSumIsFOCKINGtheSame ? ControlChars::OK : ControlChars::RESEND, drv, channel);
 
