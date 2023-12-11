@@ -3,7 +3,7 @@
 
 #include<iostream>
 
-class io {
+class IO {
 public:
     static bool hasData();
 

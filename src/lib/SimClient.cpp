@@ -1,4 +1,4 @@
-#include "simClient.hpp"
+#include "SimClient.hpp"
 
 int SimClient::client_fd = -1;
 bool SimClient::isConnected = false;
