@@ -10,6 +10,8 @@ public:
 
     virtual void writePins(std::vector<bool> values) = 0;
 
+    virtual void wait() = 0;
+
     virtual ~Connector() = default;
 };
 

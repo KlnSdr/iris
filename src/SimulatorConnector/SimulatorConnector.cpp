@@ -22,9 +22,13 @@ std::vector<bool> SimulatorConnector::readPins() {
 
 SimulatorConnector::SimulatorConnector() {
     SimClient::connectSim();
-    Util::delay_ms(2000);
+    SimulatorConnector::wait();
 }
 
 SimulatorConnector::~SimulatorConnector() {
     SimClient::disconnect();
 };
+
+void SimulatorConnector::wait() {
+    usleep(50* 1000);
+}

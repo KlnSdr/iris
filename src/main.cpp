@@ -2,7 +2,6 @@
 #include "config/config.hpp"
 #include "SimulatorConnector/SimulatorConnector.hpp"
 #include "connector/Connector.hpp"
-#include "util/Util.hpp"
 
 int main() {
     config::setup();
@@ -19,16 +18,16 @@ int main() {
     for (char value : message) {
         char highNibble = (char) value >> 4;
         connector -> writePins({(highNibble & 0x1) != 0, (highNibble & 0x2) >> 1 != 0, (highNibble & 0x4) >> 2 != 0, (highNibble & 0x8) >> 3 != 0});
-        Util::delay_ms(10);
+        connector -> wait();
 
         connector -> writePins({false, false, false, false});
-        Util::delay_ms(10);
+        connector -> wait();
 
         connector -> writePins({(value & 0x1) != 0, (value & 0x2) >> 1 != 0, (value & 0x4) >> 2 != 0, (value & 0x8) >> 3 != 0});
-        Util::delay_ms(10);
+        connector -> wait();
 
         connector -> writePins({false, false, false, false});
-        Util::delay_ms(10);
+        connector -> wait();
     }
 
     delete connector;
