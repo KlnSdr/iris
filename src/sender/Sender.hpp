@@ -8,17 +8,17 @@
 #include "../config/Config.hpp"
 #include "../controlChars/ControlCharDef.hpp"
 #include "../logger/Logger.hpp"
+#include "../connector/Connector.hpp"
 
 class Sender {
 public:
-    static void send(B15F &drv, int channel, bool isPrimarySend);
+    static void send(int channel, bool isPrimarySend);
 
-    static void reset(B15F &drv, int channel);
+    static void reset(int channel);
 
     static void setDataBuffer(std::string newData);
 
 private:
-    static void sendNibble(char value, B15F &drv, int channel);
 
     static void preprocess();
 

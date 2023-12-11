@@ -7,11 +7,6 @@ int Sender::checkSumme = 0;
 char Sender::lastNibble = ControlChars::PCK_START;
 std::vector<char> Sender::data = {};
 
-void Sender::sendNibble(char value, B15F &drv, int channel) {
-    drv.setRegister(&PORTA, (value | (value << 4)) & channel);
-    Logger::debug("write to channel " + std::to_string(channel) + ": " + Helper::charToHex(value));
-}
-
 void Sender::setDataBuffer(std::string newData) {
     rawData = newData;
     preprocess();
@@ -72,20 +67,21 @@ void Sender::preprocess() {
     }
 }
 
-void Sender::reset(B15F &drv, int channel) {
-    sendNibble(0, drv, channel);
+void Sender::reset(int channel) {
+    Connector::getInstance().writeChannel(channel, 0);
 }
 
-void Sender::send(B15F &drv, int channel, bool isPrimarySend) {
+void Sender::send(int channel, bool isPrimarySend) {
     if (!isPrimarySend) {
-        sendNibble(Config::checkSumIsFOCKINGtheSame ? ControlChars::OK : ControlChars::RESEND, drv, channel);
+        Connector::getInstance().writeChannel(channel, Config::checkSumIsFOCKINGtheSame ? ControlChars::OK
+                                                                                        : ControlChars::RESEND);
 
         if (channel == Config::CHANNEL_A) {
             Config::a_isWrite = false;
-            Helper::setChannel(channel, false, drv);
+            Helper::setChannel(channel, false, Connector::getInstance().getDrv());
         } else {
             Config::b_isWrite = false;
-            Helper::setChannel(channel, false, drv);
+            Helper::setChannel(channel, false, Connector::getInstance().getDrv());
         }
         return;
     }
@@ -95,18 +91,18 @@ void Sender::send(B15F &drv, int channel, bool isPrimarySend) {
     }
 
     if (index >= data.size()) {
-        sendNibble(0, drv, channel);
+        reset(channel);
         index = 0;
 
         if (channel == Config::CHANNEL_A) {
             Config::a_isWrite = false;
-            Helper::setChannel(channel, false, drv);
+            Helper::setChannel(channel, false, Connector::getInstance().getDrv());
         } else {
             Config::b_isWrite = false;
-            Helper::setChannel(channel, false, drv);
+            Helper::setChannel(channel, false, Connector::getInstance().getDrv());
         }
     } else {
-        sendNibble(data.at(index), drv, channel);
+        Connector::getInstance().writeChannel(channel, data.at(index));
     }
 
     index++;

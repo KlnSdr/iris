@@ -2,17 +2,28 @@
 #define IRIS_CONNECTOR_HPP
 
 #include <vector>
+#include <b15f/b15f.h>
+#include "../config/Config.hpp"
+#include "../helper/Helper.hpp"
 
 
 class Connector {
 public:
-    virtual char readPins() = 0;
+    char readChannel(int channel);
 
-    virtual void writePins(char value) = 0;
+    void writeChannel(int channel, char value);
 
-    virtual void wait() = 0;
+    static Connector getInstance();
 
-    virtual ~Connector() = default;
+    [[nodiscard]] B15F &getDrv() const;
+
+private:
+    explicit Connector(B15F &drv);
+
+    static char normalizeReading(char rawRead);
+
+    B15F &drv;
+    static Connector instance;
 };
 
 

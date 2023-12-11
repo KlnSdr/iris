@@ -11,19 +11,6 @@ int Reader::compareWert = 0;
 int Reader::checkSumsize = 1;
 std::vector<char> Reader::dataBuffer = {};
 
-char Reader::normalizeReading(char rawRead) {
-    char normalized = 0;
-
-    for (int i = 0; i < 4; i++) {
-        char lsb = rawRead & 0x1;
-        lsb <<= 3 - i;
-        normalized |= lsb;
-        rawRead >>= 1;
-    }
-
-    return normalized;
-}
-
 bool Reader::calculateCheckSumAndPrint() {
     if (dataBuffer.size() < checkSumsize) {
         Logger::info("verworfen: zu kurz");
@@ -63,17 +50,8 @@ bool Reader::calculateCheckSumAndPrint() {
     return isValidPackage;
 }
 
-void Reader::read(B15F &drv, int channel, bool isPrimarySend) {
-    char rawValue = (char) drv.getRegister(&PINA);
-    char value;
-
-    if (channel == Config::CHANNEL_A) {
-        value = rawValue & 0xF;
-    } else {
-        value = rawValue >> 4;
-    }
-
-    value = normalizeReading(value);
+void Reader::read(int channel, bool isPrimarySend) {
+    char value = Connector::getInstance().readChannel(channel);
 
     if (isPrimarySend) {
         if (value == ControlChars::OK || value == ControlChars::RESEND) {
@@ -81,10 +59,10 @@ void Reader::read(B15F &drv, int channel, bool isPrimarySend) {
 
             if (channel == Config::CHANNEL_A) {
                 Config::a_isWrite = true;
-                Helper::setChannel(channel, true, drv);
+                Helper::setChannel(channel, true, Connector::getInstance().getDrv());
             } else {
                 Config::b_isWrite = true;
-                Helper::setChannel(channel, true, drv);
+                Helper::setChannel(channel, true, Connector::getInstance().getDrv());
             }
         }
         // todo timer falls lange kein richtiges zeichen anliegt
@@ -147,10 +125,10 @@ void Reader::read(B15F &drv, int channel, bool isPrimarySend) {
 
         if (channel == Config::CHANNEL_A) {
             Config::a_isWrite = true;
-            Helper::setChannel(channel, true, drv);
+            Helper::setChannel(channel, true, Connector::getInstance().getDrv());
         } else {
             Config::b_isWrite = true;
-            Helper::setChannel(channel, true, drv);
+            Helper::setChannel(channel, true, Connector::getInstance().getDrv());
         }
 
         Logger::debug("=== end ===");
