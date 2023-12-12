@@ -15,7 +15,7 @@ public:
     static const int bufferSize = 256;
 
     static const bool a_primarySend = true;
-    static const Logger::LogLevel logLevel = Logger::LogLevel::DEBUG;
+    static const Logger::LogLevel logLevel = Logger::LogLevel::INFO;
 
     static bool a_isWrite;
     static bool b_isWrite;

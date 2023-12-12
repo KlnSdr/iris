@@ -2,6 +2,7 @@
 
 #include <string>
 #include <b15f/b15f.h>
+#include "../logger/Logger.hpp"
 
 class Helper {
 public:

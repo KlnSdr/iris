@@ -5,6 +5,7 @@
 #include "config/Config.hpp"
 #include "helper/Helper.hpp"
 #include "io/IO.hpp"
+#include "logger/Logger.hpp"
 
 const int freq = 1;
 
@@ -77,26 +78,33 @@ int main() {
 
     while (1) {
         if (!Config::a_isWrite) {
+            Logger::debug("R:A1");
             Reader::read(Config::CHANNEL_A, Config::a_primarySend);
         }
         if (!Config::b_isWrite) {
+            Logger::debug("R:B1");
             Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
         }
-        // drv.delay_ms(freq);
+//        drv.delay_ms(freq);
 
         // write
         if (Config::a_isWrite) {
+            Logger::debug("W:A");
             Sender::send(Config::CHANNEL_A, Config::a_primarySend);
         }
         if (Config::b_isWrite) {
+            Logger::debug("W:B");
             Sender::send(Config::CHANNEL_B, !Config::a_primarySend);
         }
+//        drv.delay_ms(freq);
 
         //read
         if (!Config::a_isWrite) {
+            Logger::debug("R:A2");
             Reader::read(Config::CHANNEL_A, Config::a_primarySend);
         }
         if (!Config::b_isWrite) {
+            Logger::debug("R:B2");
             Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
         }
         // drv.delay_ms(freq);

@@ -28,4 +28,5 @@ private:
     static std::vector<char> data;
     static std::string rawData;
     static int checkSumme;
+    static bool didSendOkResend;
 };

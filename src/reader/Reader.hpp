@@ -27,4 +27,5 @@ private:
     static std::vector<char> dataBuffer;
 
     static bool calculateCheckSumAndPrint();
+    static int ghosting;
 };

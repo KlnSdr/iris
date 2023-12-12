@@ -10,6 +10,7 @@ int Reader::pause = 0;
 int Reader::compareWert = 0;
 int Reader::checkSumsize = 1;
 std::vector<char> Reader::dataBuffer = {};
+int Reader::ghosting = 0;
 
 /**
  * @brief Calculates the checksum of the data buffer and prints it.
@@ -26,8 +27,9 @@ std::vector<char> Reader::dataBuffer = {};
  * @return A bool indicating whether the calculated checksum and the read checksum are equal. Returns true if the checksums are equal, false otherwise.
  */
 bool Reader::calculateCheckSumAndPrint() {
+    Logger::info("databuffer.size = " + std::to_string(dataBuffer.size()));
     if (dataBuffer.size() < checkSumsize) {
-        Logger::info("verworfen: zu kurz");
+        Logger::error("verworfen: zu kurz");
         return false;
     }
     Logger::debug("=======");
@@ -55,13 +57,17 @@ bool Reader::calculateCheckSumAndPrint() {
         Logger::debug("gleich");
         std::cout << dataBufferString << std::endl;
     } else {
-        Logger::debug("nicht gleich");
+        Logger::error("nicht gleich");
         Logger::info("verworfen, weil crc falsch");
     }
 
     dataBuffer.clear();
     Logger::debug("======");
-    return isValidPackage;
+
+    Logger::info("set checkSumIsFOCKINGtheSame to " + std::to_string(isValidPackage));
+    Config::checkSumIsFOCKINGtheSame = isValidPackage;
+
+    return true;
 }
 
 /**
@@ -89,6 +95,14 @@ void Reader::read(int channel, bool isPrimarySend) {
 
     if (isPrimarySend) {
         if (value == ControlChars::OK || value == ControlChars::RESEND) {
+            ghosting = 0;
+            if (value == ControlChars::OK) {
+                Logger::info("alles oki doki");
+            } else {
+                Logger::info("resend");
+            }
+            Logger::info("got val on primary send:" + Helper::charToHex(value));
+            Logger::info("set everythingIsOkiDoki to " + std::to_string(value == ControlChars::OK));
             Config::everythingIsOkiDoki = value == ControlChars::OK;
 
             if (channel == Config::CHANNEL_A) {
@@ -98,8 +112,19 @@ void Reader::read(int channel, bool isPrimarySend) {
                 Config::b_isWrite = true;
                 Helper::setChannel(channel, true, Connector::getInstance().getDrv());
             }
+            return;
+        } else if (ghosting > 11) {
+            ghosting = 0;
+            if (channel == Config::CHANNEL_A) {
+                Config::a_isWrite = true;
+                Helper::setChannel(channel, true, Connector::getInstance().getDrv());
+            } else {
+                Config::b_isWrite = true;
+                Helper::setChannel(channel, true, Connector::getInstance().getDrv());
+            }
+            return;
         }
-        // todo timer falls lange kein richtiges zeichen anliegt
+        ghosting++;
 
         return;
     }
@@ -154,8 +179,11 @@ void Reader::read(int channel, bool isPrimarySend) {
         buffer = 0;
         offset = 0;
 
-        bool isValidPackage = calculateCheckSumAndPrint();
-        Config::checkSumIsFOCKINGtheSame = isValidPackage;
+        bool sendResponse = calculateCheckSumAndPrint();
+
+        if (!sendResponse) {
+            return;
+        }
 
         if (channel == Config::CHANNEL_A) {
             Config::a_isWrite = true;
@@ -166,6 +194,7 @@ void Reader::read(int channel, bool isPrimarySend) {
         }
 
         Logger::debug("=== end ===");
+        return;
     }
 
     if (esc2bool == true && value != ControlChars::ESC2) {
@@ -185,7 +214,7 @@ void Reader::read(int channel, bool isPrimarySend) {
             Logger::debug("add to data buffer: " + Helper::charToHex(buffer));
             dataBuffer.push_back(buffer);
             Logger::debug(
-                    "neuer Char:    " + Helper::charToHex(buffer) + " -> " + std::to_string(static_cast<char>(buffer)));
+                    "neuer Char:    " + Helper::charToHex(buffer) + " -> " + static_cast<char>(buffer));
             offset = 0;
             buffer = 0;
         }

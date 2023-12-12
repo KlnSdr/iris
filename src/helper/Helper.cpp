@@ -32,6 +32,7 @@ int Helper::calcChecksum(std::string data) {
  */
 void Helper::setChannel(int channel, bool isWrite, B15F &drv) {
     uint8_t value = drv.getRegister(&DDRA);
+    Logger::debug("set channel " + charToHex(channel) + " to " + (isWrite ? "WRITE" : "READ"));
     if (isWrite) {
         drv.setRegister(&DDRA, value | channel);
     } else {

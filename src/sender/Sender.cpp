@@ -6,6 +6,7 @@ int Sender::index = 0;
 int Sender::checkSumme = 0;
 char Sender::lastNibble = ControlChars::PCK_START;
 std::vector<char> Sender::data = {};
+bool Sender::didSendOkResend = false;
 
 /**
  * @brief Sets the data buffer and preprocesses it.
@@ -84,7 +85,7 @@ void Sender::preprocess() {
     }
 
     for (int i = 0; i < data.size(); i++) {
-        Logger::debug(Helper::charToHex(data.at(i)));
+        Logger::debug("data part:" + Helper::charToHex(data.at(i)));
     }
 }
 
@@ -117,15 +118,20 @@ void Sender::reset(int channel) {
  */
 void Sender::send(int channel, bool isPrimarySend) {
     if (!isPrimarySend) {
-        Connector::getInstance().writeChannel(channel, Config::checkSumIsFOCKINGtheSame ? ControlChars::OK
-                                                                                        : ControlChars::RESEND);
-
-        if (channel == Config::CHANNEL_A) {
-            Config::a_isWrite = false;
-            Helper::setChannel(channel, false, Connector::getInstance().getDrv());
+        if (!didSendOkResend) {
+            Logger::error("sending ack: checkTheSame: " + std::to_string(Config::checkSumIsFOCKINGtheSame));
+            Connector::getInstance().writeChannel(channel, Config::checkSumIsFOCKINGtheSame ? ControlChars::OK
+                                                                                            : ControlChars::RESEND);
+            didSendOkResend = true;
         } else {
-            Config::b_isWrite = false;
+            if (channel == Config::CHANNEL_A) {
+                Config::a_isWrite = false;
+            } else {
+                Config::b_isWrite = false;
+            }
             Helper::setChannel(channel, false, Connector::getInstance().getDrv());
+            didSendOkResend = false;
+            reset(channel);
         }
         return;
     }
@@ -134,8 +140,14 @@ void Sender::send(int channel, bool isPrimarySend) {
         return;
     }
 
-    if (index >= data.size()) {
-        reset(channel);
+    if (index < data.size()) {
+        Connector::getInstance().writeChannel(channel, data.at(index));
+    }
+
+    index++;
+
+    if (index == data.size()) {
+        // reset(channel);
         index = 0;
 
         if (channel == Config::CHANNEL_A) {
@@ -145,9 +157,5 @@ void Sender::send(int channel, bool isPrimarySend) {
             Config::b_isWrite = false;
             Helper::setChannel(channel, false, Connector::getInstance().getDrv());
         }
-    } else {
-        Connector::getInstance().writeChannel(channel, data.at(index));
     }
-
-    index++;
 }
