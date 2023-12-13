@@ -7,6 +7,7 @@ int Sender::checkSumme = 0;
 char Sender::lastNibble = ControlChars::PCK_START;
 std::vector<char> Sender::data = {};
 bool Sender::didSendOkResend = false;
+bool Sender::disableSend = false;
 
 /**
  * @brief Sets the data buffer and preprocesses it.
@@ -136,7 +137,7 @@ void Sender::send(int channel, bool isPrimarySend) {
         return;
     }
 
-    if (Config::everythingIsOkiDoki) {
+    if (!disableSend) {
         return;
     }
 

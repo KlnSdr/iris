@@ -10,22 +10,6 @@
 const int freq = 1;
 
 /**
- * @brief Initializes the data buffer for transmission.
- *
- * This method reads data from the IO buffer into a local buffer of size Config::bufferSize.
- * The number of bytes read is stored in the variable 'written'.
- * A string 'value' is then created from the local buffer, starting from the beginning of the buffer and ending at the position determined by subtracting 'written' from Config::bufferSize.
- * This string 'value' is then set as the data buffer in the Sender class using the setDataBuffer method.
- */
-void initDataBuffer() {
-    char buffer[Config::bufferSize];
-    unsigned int written = IO::readBuffer(buffer, Config::bufferSize);
-
-    std::string value = std::string(buffer, Config::bufferSize - written);
-    Sender::setDataBuffer(value);
-}
-
-/**
  * @brief Prints a banner to the standard error output.
  *
  * This method prints a banner to the standard error output using the std::cerr stream.
@@ -66,7 +50,7 @@ void printBanner() {
 int main() {
     printBanner();
     Config::setup();
-    initDataBuffer();
+    Helper::readNextBufferAndPackage();
 
     B15F &drv = Connector::getInstance().getDrv();
 

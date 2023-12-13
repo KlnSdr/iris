@@ -21,7 +21,6 @@ public:
     static bool b_isWrite;
 
     static bool checkSumIsFOCKINGtheSame;
-    static bool everythingIsOkiDoki;
 };
 
 

@@ -103,7 +103,10 @@ void Reader::read(int channel, bool isPrimarySend) {
             }
             Logger::info("got val on primary send:" + Helper::charToHex(value));
             Logger::info("set everythingIsOkiDoki to " + std::to_string(value == ControlChars::OK));
-            Config::everythingIsOkiDoki = value == ControlChars::OK;
+
+            if (value == ControlChars::OK) {
+                Helper::readNextBufferAndPackage();
+            }
 
             if (channel == Config::CHANNEL_A) {
                 Config::a_isWrite = true;

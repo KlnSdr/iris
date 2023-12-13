@@ -1,3 +1,5 @@
+#pragma once
+
 #include <b15f/b15f.h>
 #include <iostream>
 #include <string>
@@ -17,6 +19,7 @@ public:
     static void reset(int channel);
 
     static void setDataBuffer(std::string newData);
+    static bool disableSend;
 
 private:
 
