@@ -70,6 +70,9 @@ std::string Helper::charToHex(char chr) {
 void Helper::readNextBufferAndPackage() {
     char buffer[Config::bufferSize];
     unsigned int bytesLeft = IO::readBuffer(buffer, Config::bufferSize);
+    if (bytesLeft == Config::bufferSize) {
+        Sender::disableSend = true;
+    }
 
     std::string value = std::string(buffer, Config::bufferSize - bytesLeft);
     Sender::setDataBuffer(value);
