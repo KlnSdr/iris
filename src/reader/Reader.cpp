@@ -11,6 +11,7 @@ int Reader::compareWert = 0;
 int Reader::checkSumsize = 1;
 std::vector<char> Reader::dataBuffer = {};
 int Reader::ghosting = 0;
+int Reader::lastPackageId = 0;
 
 /**
  * @brief Calculates the checksum of the data buffer and prints it.
@@ -178,6 +179,19 @@ void Reader::read(int channel, bool isPrimarySend) {
         beginbool = false;
         buffer = 0;
         offset = 0;
+
+        char packageId = dataBuffer.at(0) & 0xFF;
+        Logger::debug("packageId: " + std::to_string(packageId));
+        dataBuffer.erase(dataBuffer.begin());
+
+        if (packageId < lastPackageId && lastPackageId == 4) {
+            lastPackageId = 0;
+            Logger::debug("resetting lastPackageId");
+        }
+        if (packageId <= lastPackageId) {
+            Logger::debug("verworfen: gleiche packageId");
+            return;
+        }
 
         bool sendResponse = calculateCheckSumAndPrint();
 

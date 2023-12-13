@@ -28,4 +28,5 @@ private:
 
     static bool calculateCheckSumAndPrint();
     static int ghosting;
+    static int lastPackageId;
 };

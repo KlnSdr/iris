@@ -7,6 +7,7 @@ int Sender::checkSumme = 0;
 char Sender::lastNibble = ControlChars::PCK_START;
 std::vector<char> Sender::data = {};
 bool Sender::didSendOkResend = false;
+char Sender::packageId = 0;
 
 /**
  * @brief Sets the data buffer and preprocesses it.
@@ -39,6 +40,9 @@ void Sender::preprocess() {
         data.push_back(0);
     }
     data.push_back(ControlChars::PCK_START);
+    lastNibble = ControlChars::PCK_START;
+
+    rawData.insert(rawData.begin(), (char) (++packageId % 4) + 1);
 
     checkSumme = Helper::calcChecksum(rawData);
     Logger::debug("Checksumme: " + std::to_string(checkSumme));

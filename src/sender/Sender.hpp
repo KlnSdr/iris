@@ -29,4 +29,5 @@ private:
     static std::string rawData;
     static int checkSumme;
     static bool didSendOkResend;
+    static char packageId;
 };
