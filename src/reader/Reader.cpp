@@ -192,6 +192,7 @@ void Reader::read(int channel, bool isPrimarySend) {
             Logger::debug("verworfen: gleiche packageId");
             return;
         }
+        lastPackageId = packageId;
 
         bool sendResponse = calculateCheckSumAndPrint();
 
