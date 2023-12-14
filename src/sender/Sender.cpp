@@ -36,17 +36,14 @@ void Sender::setDataBuffer(std::string newData) {
  * Finally, the method logs the hexadecimal representation of each byte in the data vector.
  */
 void Sender::preprocess() {
-    for (int i = 0; i < 50; i++) {
-        data.push_back(0);
-    }
     data.push_back(ControlChars::PCK_START);
     lastNibble = ControlChars::PCK_START;
-
-    rawData.insert(rawData.begin(), (char) (++packageId % 4) + 1);
 
     checkSumme = Helper::calcChecksum(rawData);
     Logger::debug("Checksumme: " + std::to_string(checkSumme));
     rawData.push_back((char) (checkSumme & 0xFF));
+
+    rawData.insert(rawData.begin(), (char) (++packageId % 4) + 1);
 
     for (int i = 0; i < rawData.length(); i++) {
         char leftNibble = (char) rawData[i] >> 4;

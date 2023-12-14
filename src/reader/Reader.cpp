@@ -60,6 +60,7 @@ bool Reader::calculateCheckSumAndPrint() {
     } else {
         Logger::error("nicht gleich");
         Logger::info("verworfen, weil crc falsch");
+        lastPackageId--;
     }
 
     dataBuffer.clear();
@@ -180,19 +181,24 @@ void Reader::read(int channel, bool isPrimarySend) {
         buffer = 0;
         offset = 0;
 
+        if (dataBuffer.size() == 0) {
+            return;
+        }
+
         char packageId = dataBuffer.at(0) & 0xFF;
-        Logger::debug("packageId: " + std::to_string(packageId));
+        Logger::info("packageId: " + std::to_string(packageId));
         dataBuffer.erase(dataBuffer.begin());
 
         if (packageId < lastPackageId && lastPackageId == 4) {
             lastPackageId = 0;
-            Logger::debug("resetting lastPackageId");
+            Logger::info("resetting lastPackageId");
         }
         if (packageId <= lastPackageId) {
-            Logger::debug("verworfen: gleiche packageId");
+            Logger::info("verworfen: gleiche packageId");
+            dataBuffer.clear();
             return;
         }
-        lastPackageId = packageId;
+        lastPackageId++;
 
         bool sendResponse = calculateCheckSumAndPrint();
 
