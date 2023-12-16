@@ -71,6 +71,7 @@ void Helper::readNextBufferAndPackage() {
     char buffer[Config::bufferSize];
     unsigned int bytesLeft = IO::readBuffer(buffer, Config::bufferSize);
     if (bytesLeft == Config::bufferSize) {
+        Logger::info("disable sender");
         Sender::disableSend = true;
     }
 

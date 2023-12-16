@@ -7,7 +7,7 @@
 #include "io/IO.hpp"
 #include "logger/Logger.hpp"
 
-const int freq = 1;
+const int freq = 10;
 
 /**
  * @brief Prints a banner to the standard error output.
@@ -69,7 +69,7 @@ int main() {
             Logger::debug("R:B1");
             Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
         }
-//        drv.delay_ms(freq);
+        drv.delay_ms(freq);
 
         // write
         if (Config::a_isWrite) {
@@ -80,7 +80,7 @@ int main() {
             Logger::debug("W:B");
             Sender::send(Config::CHANNEL_B, !Config::a_primarySend);
         }
-//        drv.delay_ms(freq);
+        drv.delay_ms(freq);
 
         //read
         if (!Config::a_isWrite) {
@@ -91,6 +91,6 @@ int main() {
             Logger::debug("R:B2");
             Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
         }
-        // drv.delay_ms(freq);
+         drv.delay_ms(freq);
     }
 }

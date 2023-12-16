@@ -19,6 +19,7 @@ bool Sender::disableSend = false;
  */
 void Sender::setDataBuffer(std::string newData) {
     rawData = newData;
+    std::cout << "rawData: " << rawData << std::endl;
     preprocess();
 }
 
@@ -36,9 +37,6 @@ void Sender::setDataBuffer(std::string newData) {
  * Finally, the method logs the hexadecimal representation of each byte in the data vector.
  */
 void Sender::preprocess() {
-    for (int i = 0; i < 50; i++) {
-        data.push_back(0);
-    }
     data.push_back(ControlChars::PCK_START);
 
     checkSumme = Helper::calcChecksum(rawData);
@@ -137,7 +135,7 @@ void Sender::send(int channel, bool isPrimarySend) {
         return;
     }
 
-    if (!disableSend) {
+    if (disableSend) {
         return;
     }
 

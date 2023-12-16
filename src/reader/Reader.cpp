@@ -177,12 +177,16 @@ void Reader::read(int channel, bool isPrimarySend) {
         esc2bool = false;
 
     } else if (value == ControlChars::PCK_END && esc2bool == false) {
-        endbool = true;
+        bool sendResponse = calculateCheckSumAndPrint();
+
+        escbool = false;
+        esc2bool = false;
         beginbool = false;
+        endbool = false;
         buffer = 0;
         offset = 0;
-
-        bool sendResponse = calculateCheckSumAndPrint();
+        pause = 0;
+        dataBuffer = {};
 
         if (!sendResponse) {
             return;
