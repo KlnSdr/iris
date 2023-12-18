@@ -31,6 +31,14 @@ int Helper::calcChecksum(std::string data) {
  * @param drv A reference to the B15F driver object used to interact with the hardware.
  */
 void Helper::setChannel(int channel, bool isWrite, B15F &drv) {
+    if (Config::doPhysicalSwitch && channel == Config::CHANNEL_A && !Config::aIsSendChannel) {
+        Logger::error("switching to channel B");
+        channel = Config::CHANNEL_B;
+    } else if (Config::doPhysicalSwitch && channel == Config::CHANNEL_B && Config::aIsSendChannel) {
+        Logger::error("switching to channel A");
+        channel = Config::CHANNEL_A;
+    }
+
     uint8_t value = drv.getRegister(&DDRA);
     Logger::debug("set channel " + charToHex(channel) + " to " + (isWrite ? "WRITE" : "READ"));
     if (isWrite) {

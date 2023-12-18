@@ -1,12 +1,15 @@
 #include "IO.hpp"
 
+bool IO::_hasData = true;
+
 /**
  * @brief Checks if there is data available.
  *
  * @return true if there is data available, false otherwise.
  */
 bool IO::hasData() {
-    return !std::cin.eof();
+    // return !std::cin.eof();
+    return _hasData;
 }
 
 /**
@@ -15,10 +18,9 @@ bool IO::hasData() {
  * @return The byte read from the input.
  */
 char IO::readByte() {
-    char tmpBuffer[1];
-    std::cin.read(tmpBuffer, 1);
-
-    return tmpBuffer[0];
+    char tmp;
+    std::cin.get(tmp);
+    return tmp;
 }
 
 /**
@@ -30,7 +32,12 @@ char IO::readByte() {
  */
 unsigned int IO::readBuffer(char *buffer, unsigned int size) {
     while (hasData() && size > 0) {
-        *buffer = readByte();
+        char val = readByte();
+        if (val == '\0') {
+            _hasData = false;
+            break;
+        }
+        *buffer = val;
         buffer++;
         size--;
     }

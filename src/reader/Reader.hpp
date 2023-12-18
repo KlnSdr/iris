@@ -12,7 +12,7 @@
 class Reader {
 public:
     static void read(int channel, bool isPrimaryRead);
-
+    static void read1();
 private:
     static bool escbool;
     static bool esc2bool;

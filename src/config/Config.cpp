@@ -18,4 +18,7 @@ void Config::setup() {
 bool Config::a_isWrite = Config::a_primarySend;
 bool Config::b_isWrite = !Config::a_primarySend;
 
+bool Config::doPhysicalSwitch = false;
+bool Config::aIsSendChannel = true;
+bool Config::doSendResponse = false;
 bool Config::checkSumIsFOCKINGtheSame = false;

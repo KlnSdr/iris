@@ -66,6 +66,7 @@ bool Reader::calculateCheckSumAndPrint() {
 
     Logger::info("set checkSumIsFOCKINGtheSame to " + std::to_string(isValidPackage));
     Config::checkSumIsFOCKINGtheSame = isValidPackage;
+    Config::doSendResponse = true;
 
     return true;
 }
@@ -90,7 +91,7 @@ bool Reader::calculateCheckSumAndPrint() {
  * @param channel The channel to read from. This should be an int representing the channel.
  * @param isPrimarySend A boolean indicating whether the method should check for an acknowledgement or resend request. If true, the method checks for an acknowledgement or resend request. If false, the method processes the read value according to the communication protocol.
  */
-void Reader::read(int channel, bool isPrimarySend) {
+/*void Reader::read(int channel, bool isPrimarySend) {
     char value = Connector::getInstance().readChannel(channel);
 
     if (isPrimarySend) {
@@ -116,7 +117,7 @@ void Reader::read(int channel, bool isPrimarySend) {
                 Helper::setChannel(channel, true, Connector::getInstance().getDrv());
             }
             return;
-        } else if (ghosting > 11) {
+        } else if (ghosting > 21) {
             ghosting = 0;
             if (channel == Config::CHANNEL_A) {
                 Config::a_isWrite = true;
@@ -131,6 +132,8 @@ void Reader::read(int channel, bool isPrimarySend) {
 
         return;
     }
+
+    Logger::debug("gelesener Char: " + Helper::charToHex(value));
 
     if (compareWert == value) {
         pause++;
@@ -188,7 +191,7 @@ void Reader::read(int channel, bool isPrimarySend) {
         pause = 0;
         dataBuffer = {};
 
-        if (!sendResponse) {
+        if (sendResponse == false) {
             return;
         }
 
@@ -234,4 +237,116 @@ void Reader::read(int channel, bool isPrimarySend) {
 
     }
 
+}*/
+void Reader::read1(){
+
+    char value = Connector::getInstance().readChannel(Config::CHANNEL_B);
+    if (compareWert == value) {
+        pause++;
+        return;
+    } else if (pause > 20) {
+        buffer = 0;
+        endbool = true;
+        beginbool = false;
+        std::cout << std::endl;
+        pause = 0;
+        return;
+    }
+    pause = 0;
+    compareWert = value;
+
+    Logger::info("gelesener Hex: " + Helper::charToHex(value));
+
+    Logger::error("endbool: " + std::to_string(endbool) + "  beginbool: " + std::to_string(beginbool));
+    if (endbool && !beginbool) {
+        if (value == ControlChars::OK) {
+            Logger::info("=== ok ===");
+            Helper::readNextBufferAndPackage();
+            Logger::error("enable sender");
+            Sender::disableSend = false;
+            return;
+        } else if (value == ControlChars::RESEND) {
+            Logger::info("=== resend ===");
+            Logger::error("enable sender");
+            Sender::disableSend = false;
+            return;
+        }
+    }
+
+    if (escbool == true) {
+        value = (~value) & 0xF;
+        Logger::debug("inv " + Helper::charToHex(value));
+        escbool = false;
+    }
+
+    if (value == ControlChars::ESC2 && compareWert == value) {
+        esc2bool = true;
+    }
+
+    if (value == ControlChars::ESC1 && esc2bool == false) {
+        escbool = true;
+    }
+
+    if (value == ControlChars::PCK_START && beginbool == false) {
+        Logger::debug("=== begin ===");
+        beginbool = true;
+        endbool = false;
+        escbool = false;
+        esc2bool = false;
+        return;
+    }
+
+
+    if (value == ControlChars::PCK_END && esc2bool == true) {
+        endbool = false;
+        esc2bool = false;
+
+    } else if (value == ControlChars::PCK_END && esc2bool == false) {
+        bool sendResponse = calculateCheckSumAndPrint();
+
+        escbool = false;
+        esc2bool = false;
+        beginbool = false;
+        endbool = true;
+        buffer = 0;
+        offset = 0;
+        pause = 0;
+        dataBuffer = {};
+
+        if (sendResponse == false) {
+            return;
+        }
+        Logger::debug("=== end ===");
+        return;
+    }
+
+    if (esc2bool == true && value != ControlChars::ESC2) {
+        esc2bool = false;
+    }
+
+    Logger::debug("begin: " + std::to_string(beginbool) + "  End: " + std::to_string(endbool) + "  esc2:  " +
+                  std::to_string(esc2bool) + "  esc:   " + std::to_string(escbool));
+    if (beginbool == true && endbool == false && esc2bool == false && escbool == false) {
+
+        buffer <<= offset;
+        Logger::debug("add to buffer: " + Helper::charToHex(value));
+        buffer += value;
+        offset += 4;
+
+        if (offset > 4) {
+            Logger::debug("add to data buffer: " + Helper::charToHex(buffer));
+            dataBuffer.push_back(buffer);
+            Logger::debug(
+                    "neuer Char:    " + Helper::charToHex(buffer) + " -> " + static_cast<char>(buffer));
+            offset = 0;
+            buffer = 0;
+        }
+
+        if (pause >= 6) {
+            buffer = 0;
+            offset = 0;
+            pause = 0;
+        }
+
+    }
 }

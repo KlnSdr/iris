@@ -15,12 +15,17 @@ char Connector::readChannel(int channel) {
     char rawValue = (char) drv.getRegister(&PINA);
     char value;
 
+    if (Config::doPhysicalSwitch && !Config::aIsSendChannel) {
+        channel = ~channel & 0xFF;
+    }
+
     if (channel == Config::CHANNEL_A) {
         value = rawValue & 0xF;
     } else {
         value = rawValue >> 4;
     }
-    return normalizeReading(value);
+
+    return Config::doPhysicalSwitch ? value : normalizeReading(value);
 }
 
 /**
@@ -71,6 +76,13 @@ Connector Connector::getInstance() {
  * representing the value.
  */
 void Connector::writeChannel(int channel, char value) {
+    if (Config::doPhysicalSwitch && channel == Config::CHANNEL_A && !Config::aIsSendChannel) {
+        Logger::error("switching to channel B");
+        channel = Config::CHANNEL_B;
+    } else if (Config::doPhysicalSwitch && channel == Config::CHANNEL_B && Config::aIsSendChannel) {
+        Logger::error("switching to channel A");
+        channel = Config::CHANNEL_A;
+    }
     drv.setRegister(&PORTA, (value | (value << 4)) & channel);
     Logger::debug("write to channel " + std::to_string(channel) + ": " + Helper::charToHex(value));
 }

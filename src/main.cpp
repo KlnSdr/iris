@@ -7,7 +7,7 @@
 #include "io/IO.hpp"
 #include "logger/Logger.hpp"
 
-const int freq = 10;
+const int freq = 100;
 
 /**
  * @brief Prints a banner to the standard error output.
@@ -25,6 +25,21 @@ void printBanner() {
     std::cerr << " ##  ##    ##   ##  ##    ##" << std::endl;
     std::cerr << "#### ##     ## ####  ######" << std::endl;
     std::cerr << std::endl;
+}
+
+void setupChannels(int argc, char* argv[]) {
+    for (int i = 1; i < argc; i++) {
+        if (strncmp(argv[i], "-c", 2) == 0) {
+            Config::doPhysicalSwitch = true;
+            if (strncmp(argv[i] + 2, "1", 1) == 0) {
+                Logger::error("set channel A to write");
+                Config::aIsSendChannel = true;
+            } else {
+                Logger::error("set channel B to write");
+                Config::aIsSendChannel = false;
+            }
+        }
+    }
 }
 
 /**
@@ -47,7 +62,9 @@ void printBanner() {
  *
  * @return int This function returns 0 upon successful execution.
  */
-int main() {
+int main(int argc, char* argv[]) {
+    setupChannels(argc, argv);
+
     printBanner();
     Config::setup();
     Helper::readNextBufferAndPackage();
@@ -61,36 +78,45 @@ int main() {
     // drv.delay_ms(2000);
 
     while (1) {
-        if (!Config::a_isWrite) {
-            Logger::debug("R:A1");
-            Reader::read(Config::CHANNEL_A, Config::a_primarySend);
-        }
-        if (!Config::b_isWrite) {
-            Logger::debug("R:B1");
-            Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
-        }
+//        if (!Config::a_isWrite) {
+//            Logger::debug("R:A1");
+//            Reader::read(Config::CHANNEL_A, Config::a_primarySend);
+//        }
+//        if (!Config::b_isWrite) {
+//            Logger::debug("R:B1");
+//            Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
+//        }
+//        drv.delay_ms(freq);
+//
+//        // write
+//        if (Config::a_isWrite) {
+//            Logger::debug("W:A");
+//            Sender::send(Config::CHANNEL_A, Config::a_primarySend);
+//        }
+//        if (Config::b_isWrite) {
+//            Logger::debug("W:B");
+//            Sender::send(Config::CHANNEL_B, !Config::a_primarySend);
+//        }
+//        drv.delay_ms(freq);
+//
+//        //read
+//        if (!Config::a_isWrite) {
+//            Logger::debug("R:A2");
+//            Reader::read(Config::CHANNEL_A, Config::a_primarySend);
+//        }
+//        if (!Config::b_isWrite) {
+//            Logger::debug("R:B2");
+//            Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
+//        }
+//         drv.delay_ms(freq);
+
+        Reader::read1();
         drv.delay_ms(freq);
 
-        // write
-        if (Config::a_isWrite) {
-            Logger::debug("W:A");
-            Sender::send(Config::CHANNEL_A, Config::a_primarySend);
-        }
-        if (Config::b_isWrite) {
-            Logger::debug("W:B");
-            Sender::send(Config::CHANNEL_B, !Config::a_primarySend);
-        }
+        Sender::send1();
         drv.delay_ms(freq);
 
-        //read
-        if (!Config::a_isWrite) {
-            Logger::debug("R:A2");
-            Reader::read(Config::CHANNEL_A, Config::a_primarySend);
-        }
-        if (!Config::b_isWrite) {
-            Logger::debug("R:B2");
-            Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
-        }
-         drv.delay_ms(freq);
+        Reader::read1();
+        drv.delay_ms(freq);
     }
 }

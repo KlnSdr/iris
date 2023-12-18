@@ -11,6 +11,7 @@ public:
 
 private:
     static char readByte();
+    static bool _hasData;
 };
 
 

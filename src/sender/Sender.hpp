@@ -20,7 +20,7 @@ public:
 
     static void setDataBuffer(std::string newData);
     static bool disableSend;
-
+    static void send1();
 private:
 
     static void preprocess();

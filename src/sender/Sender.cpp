@@ -37,6 +37,7 @@ void Sender::setDataBuffer(std::string newData) {
  * Finally, the method logs the hexadecimal representation of each byte in the data vector.
  */
 void Sender::preprocess() {
+    data.clear();
     data.push_back(ControlChars::PCK_START);
 
     checkSumme = Helper::calcChecksum(rawData);
@@ -115,7 +116,7 @@ void Sender::reset(int channel) {
  * @param channel The channel to send data over. This should be an int representing the channel.
  * @param isPrimarySend A boolean indicating whether the method should write an acknowledgement or resend request to the channel. If true, the method sends data over the channel according to the communication protocol. If false, the method writes an acknowledgement or resend request to the channel.
  */
-void Sender::send(int channel, bool isPrimarySend) {
+/*void Sender::send(int channel, bool isPrimarySend) {
     if (!isPrimarySend) {
         if (!didSendOkResend) {
             Logger::error("sending ack: checkTheSame: " + std::to_string(Config::checkSumIsFOCKINGtheSame));
@@ -156,5 +157,33 @@ void Sender::send(int channel, bool isPrimarySend) {
             Config::b_isWrite = false;
             Helper::setChannel(channel, false, Connector::getInstance().getDrv());
         }
+    }
+}*/
+void Sender::send1() {
+
+    if (disableSend && Config::doSendResponse) {
+        Logger::error(Config::checkSumIsFOCKINGtheSame ? Helper::charToHex(ControlChars::OK)
+                                                       : Helper::charToHex(ControlChars::RESEND));
+        Connector::getInstance().writeChannel(Config::CHANNEL_A, Config::checkSumIsFOCKINGtheSame ? ControlChars::OK
+                                                                                                            : ControlChars::RESEND);
+        Config::doSendResponse = false;
+    }
+
+    if (disableSend) {
+        return;
+    }
+
+    if (index < data.size()) {
+        Connector::getInstance().writeChannel(Config::CHANNEL_A, data.at(index));
+    }
+
+    index++;
+
+
+    if (index == data.size()) {
+        // reset(channel);
+        index = 0;
+        disableSend = true;
+        Logger::error("disable sender");
     }
 }
