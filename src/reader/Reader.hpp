@@ -11,7 +11,7 @@
 
 class Reader {
 public:
-    static void read(int channel, bool isPrimaryRead);
+    static void read(int channel, bool isPrimarySend);
 
 private:
     static bool escbool;

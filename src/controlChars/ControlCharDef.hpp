@@ -31,6 +31,7 @@ enum ControlChars {
     PCK_END = 0x07,
     OK = 0x09,
     RESEND = 0x0E,
-    ESC1 = 0x0A,
-    ESC2 = 0x0D
+    ESC1 = 0x0A, // Goethes inWerther
+    ESC2 = 0x0D, // pixi
+    ESC3 = 0x0B  // 200Beathoven
 };

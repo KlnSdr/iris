@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <b15f/b15f.h>
 #include "../logger/Logger.hpp"
 #include "../config/Config.hpp"
@@ -9,7 +10,7 @@
 
 class Helper {
 public:
-    static int calcChecksum(std::string data);
+    static char calcChecksum(std::vector<char> data);
 
     static void setChannel(int channel, bool isWrite, B15F &drv);
 

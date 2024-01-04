@@ -10,12 +10,17 @@
  * @param data The string for which to calculate the checksum. This should be a std::string containing the data.
  * @return The calculated checksum. This is an int representing the checksum of the given string.
  */
-int Helper::calcChecksum(std::string data) {
-    int checkSumme = 0;
-    for (int i = 0; i < data.length(); i++) {
-        checkSumme += data.at(i);
+char Helper::calcChecksum(std::vector<char> data) {
+    unsigned char checkSumme = 0;
+    std::cout << "(((((((((((((((((((((((((((((((" << std::endl;
+    for (int i = 0; i < data.size(); i++) {
+        std::cout << Helper::charToHex(data.at(i));
+        checkSumme += (char)(data.at(i) & 0xFF);
+        checkSumme &= 0xFF;
+        std::cout << " -> " << Helper::charToHex(checkSumme) << std::endl;
     }
-    return checkSumme % 0xFF;
+    std::cout << "(((((((((((((((((((((((((((((((" << std::endl;
+    return (checkSumme % 0xFF) & 0xFF;
 }
 
 /**
@@ -36,7 +41,7 @@ void Helper::setChannel(int channel, bool isWrite, B15F &drv) {
     if (isWrite) {
         drv.setRegister(&DDRA, value | channel);
     } else {
-        drv.setRegister(&DDRA, value & ~channel);
+        drv.setRegister(&DDRA, value & ((~channel) & 0xFF));
     }
 }
 
@@ -54,7 +59,7 @@ void Helper::setChannel(int channel, bool isWrite, B15F &drv) {
  */
 std::string Helper::charToHex(char chr) {
     std::stringstream ss;
-    ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(chr);
+    ss << std::setw(2) << std::setfill('0') << std::hex << ((int)chr & 0xFF);
     std::string hexString = ss.str();
     return hexString;
 }
@@ -70,11 +75,14 @@ std::string Helper::charToHex(char chr) {
 void Helper::readNextBufferAndPackage() {
     char buffer[Config::bufferSize];
     unsigned int bytesLeft = IO::readBuffer(buffer, Config::bufferSize);
+    std::cout << "'";
+    std::cout.write(buffer, Config::bufferSize - bytesLeft);
+    std::cout << "'" << std::endl;
     if (bytesLeft == Config::bufferSize) {
         Logger::info("disable sender");
         Sender::disableSend = true;
     }
 
-    std::string value = std::string(buffer, Config::bufferSize - bytesLeft);
+    std::vector<char> value(buffer, buffer + (Config::bufferSize - bytesLeft));
     Sender::setDataBuffer(value);
 }

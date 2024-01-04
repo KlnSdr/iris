@@ -29,8 +29,14 @@ char IO::readByte() {
  * @return The number of bytes left in the buffer
  */
 unsigned int IO::readBuffer(char *buffer, unsigned int size) {
-    while (hasData() && size > 0) {
-        *buffer = readByte();
+    char value;
+    while (size > 0) {
+        value = getchar();
+        if (value == EOF) {
+            break;
+        }
+        // *buffer = readByte();
+        *buffer = value;
         buffer++;
         size--;
     }

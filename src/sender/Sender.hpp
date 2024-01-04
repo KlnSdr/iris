@@ -18,7 +18,7 @@ public:
 
     static void reset(int channel);
 
-    static void setDataBuffer(std::string newData);
+    static void setDataBuffer(std::vector<char> newData);
     static bool disableSend;
 
 private:
@@ -29,7 +29,7 @@ private:
     static int index;
     static char lastNibble;
     static std::vector<char> data;
-    static std::string rawData;
-    static int checkSumme;
+    static std::vector<char> rawData;
+    static char checkSumme;
     static bool didSendOkResend;
 };

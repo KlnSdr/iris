@@ -1,9 +1,9 @@
 #include "Sender.hpp"
 
 // char Sender::let[11] = {'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd'};
-std::string Sender::rawData = "";
+std::vector<char> Sender::rawData = {};
 int Sender::index = 0;
-int Sender::checkSumme = 0;
+char Sender::checkSumme = 0;
 char Sender::lastNibble = ControlChars::PCK_START;
 std::vector<char> Sender::data = {};
 bool Sender::didSendOkResend = false;
@@ -17,9 +17,8 @@ bool Sender::disableSend = false;
  *
  * @param newData The new data to be set in the rawData member. This should be a std::string containing the data to be transmitted.
  */
-void Sender::setDataBuffer(std::string newData) {
+void Sender::setDataBuffer(std::vector<char> newData) {
     rawData = newData;
-    std::cout << "rawData: " << rawData << std::endl;
     preprocess();
 }
 
@@ -37,22 +36,34 @@ void Sender::setDataBuffer(std::string newData) {
  * Finally, the method logs the hexadecimal representation of each byte in the data vector.
  */
 void Sender::preprocess() {
+    data.clear();
+    for (int i = 0; i < 50; i++) {
+        data.push_back(0);
+    }
     data.push_back(ControlChars::PCK_START);
 
     checkSumme = Helper::calcChecksum(rawData);
-    Logger::debug("Checksumme: " + std::to_string(checkSumme));
+    Logger::info("Checksumme: " + Helper::charToHex(checkSumme));
     rawData.push_back((char) (checkSumme & 0xFF));
 
-    for (int i = 0; i < rawData.length(); i++) {
-        char leftNibble = (char) rawData[i] >> 4;
+    for (int i = 0; i < rawData.size(); i++) {
+        Logger::info(Helper::charToHex(rawData.at(i)));
+    }
+    Logger::info("////////////////////////////////");
+
+    for (int i = 0; i < rawData.size(); i++) {
+        char leftNibble = ((char) rawData[i] >> 4) & 0x0F;
         char rightNibble = (char) rawData[i] & 0x0F;
 
-        if (leftNibble == ControlChars::ESC1 || leftNibble == ControlChars::PCK_END) {
+        if (leftNibble == ControlChars::ESC1 || leftNibble == ControlChars::PCK_END || leftNibble == ControlChars::ESC3) {
             data.push_back(ControlChars::ESC2);
         } else if (leftNibble == ControlChars::ESC2 || leftNibble == lastNibble) {
             leftNibble = (~leftNibble) & 0x0F;
             if (leftNibble == ControlChars::ESC1) {
                 data.push_back(ControlChars::ESC2);
+                leftNibble = (~leftNibble) & 0x0F;
+            } else if (lastNibble == ControlChars::ESC1) {
+                data.push_back(ControlChars::ESC3);
                 leftNibble = (~leftNibble) & 0x0F;
             } else {
                 data.push_back(ControlChars::ESC1);
@@ -61,12 +72,15 @@ void Sender::preprocess() {
         data.push_back(leftNibble);
 
 
-        if (rightNibble == ControlChars::ESC1 || rightNibble == ControlChars::PCK_END) {
+        if (rightNibble == ControlChars::ESC1 || rightNibble == ControlChars::PCK_END || rightNibble == ControlChars::ESC3) {
             data.push_back(ControlChars::ESC2);
         } else if (rightNibble == ControlChars::ESC2 || rightNibble == leftNibble) {
             rightNibble = (~rightNibble) & 0x0F;
             if (rightNibble == ControlChars::ESC1) {
                 data.push_back(ControlChars::ESC2);
+                rightNibble = (~rightNibble) & 0x0F;
+            } else if (leftNibble == ControlChars::ESC1) {
+                data.push_back(ControlChars::ESC3);
                 rightNibble = (~rightNibble) & 0x0F;
             } else {
                 data.push_back(ControlChars::ESC1);
@@ -84,8 +98,9 @@ void Sender::preprocess() {
     }
 
     for (int i = 0; i < data.size(); i++) {
-        Logger::debug("data part:" + Helper::charToHex(data.at(i)));
+        Logger::info(Helper::charToHex(data.at(i)));
     }
+    Logger::info("###########################");
 }
 
 /**
@@ -140,12 +155,13 @@ void Sender::send(int channel, bool isPrimarySend) {
     }
 
     if (index < data.size()) {
+        Logger::info("send: " + Helper::charToHex(data.at(index)));
         Connector::getInstance().writeChannel(channel, data.at(index));
     }
 
     index++;
 
-    if (index == data.size()) {
+    if (index == data.size() + 1) {
         // reset(channel);
         index = 0;
 
