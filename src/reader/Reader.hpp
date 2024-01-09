@@ -5,7 +5,7 @@
 #include <string>
 #include "../helper/Helper.hpp"
 #include "../config/Config.hpp"
-#include "../controlChars/ControlCharDef.hpp"
+#include "../enums/ControlCharDef.hpp"
 #include "../logger/Logger.hpp"
 #include "../connector/Connector.hpp"
 

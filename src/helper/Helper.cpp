@@ -12,14 +12,14 @@
  */
 char Helper::calcChecksum(std::vector<char> data) {
     unsigned char checkSumme = 0;
-    std::cout << "(((((((((((((((((((((((((((((((" << std::endl;
+    Logger::debug("(((((((((((((((((((((((((((((((");
     for (int i = 0; i < data.size(); i++) {
-        std::cout << Helper::charToHex(data.at(i));
+        Logger::debug(Helper::charToHex(data.at(i)));
         checkSumme += (char)(data.at(i) & 0xFF);
         checkSumme &= 0xFF;
-        std::cout << " -> " << Helper::charToHex(checkSumme) << std::endl;
+        Logger::debug(" -> " + Helper::charToHex(checkSumme));
     }
-    std::cout << "(((((((((((((((((((((((((((((((" << std::endl;
+    Logger::debug("(((((((((((((((((((((((((((((((");
     return (checkSumme % 0xFF) & 0xFF;
 }
 
@@ -37,11 +37,20 @@ char Helper::calcChecksum(std::vector<char> data) {
  */
 void Helper::setChannel(int channel, bool isWrite, B15F &drv) {
     uint8_t value = drv.getRegister(&DDRA);
-    Logger::debug("set channel " + charToHex(channel) + " to " + (isWrite ? "WRITE" : "READ"));
+    Logger::error("aktuell ddra: " + Helper::charToHex(value));
+
+    if (isWrite) {
+        Logger::error("setze " + std::to_string(channel) + " auf output");
+    } else {
+        Logger::error("setze " + std::to_string(channel) + " auf input");
+    }
+
     if (isWrite) {
         drv.setRegister(&DDRA, value | channel);
+        Logger::error("neu ddra: " + Helper::charToHex(value | channel));
     } else {
         drv.setRegister(&DDRA, value & ((~channel) & 0xFF));
+        Logger::error("neu ddra: " + Helper::charToHex(value & ((~channel) & 0xFF)));
     }
 }
 
@@ -75,14 +84,19 @@ std::string Helper::charToHex(char chr) {
 void Helper::readNextBufferAndPackage() {
     char buffer[Config::bufferSize];
     unsigned int bytesLeft = IO::readBuffer(buffer, Config::bufferSize);
-    std::cout << "'";
-    std::cout.write(buffer, Config::bufferSize - bytesLeft);
-    std::cout << "'" << std::endl;
+//    std::cout << "'";
+//    std::cout.write(buffer, Config::bufferSize - bytesLeft);
+//    std::cout << "'" << std::endl;
     if (bytesLeft == Config::bufferSize) {
         Logger::info("disable sender");
-        Sender::disableSend = true;
+        return;
     }
 
     std::vector<char> value(buffer, buffer + (Config::bufferSize - bytesLeft));
-    Sender::setDataBuffer(value);
+    Sender::addToSendQueue(PackageType::DATA_PKG, value);
+}
+
+bool Helper::validateMessage(std::vector<char> data, char sendCheckSum) {
+    char checkSum = Helper::calcChecksum(data);
+    return checkSum == sendCheckSum;
 }

@@ -7,20 +7,8 @@ char Sender::checkSumme = 0;
 char Sender::lastNibble = ControlChars::PCK_START;
 std::vector<char> Sender::data = {};
 bool Sender::didSendOkResend = false;
-bool Sender::disableSend = false;
-
-/**
- * @brief Sets the data buffer and preprocesses it.
- *
- * This method sets the rawData member to the provided newData string and then calls the preprocess method.
- * The preprocess method is responsible for preparing the rawData for transmission according to the communication protocol.
- *
- * @param newData The new data to be set in the rawData member. This should be a std::string containing the data to be transmitted.
- */
-void Sender::setDataBuffer(std::vector<char> newData) {
-    rawData = newData;
-    preprocess();
-}
+std::queue<std::tuple<PackageType, std::vector<char>>> Sender::sendQueue = {};
+std::vector<char> Sender::lastDataPackage = {};
 
 /**
  * @brief Preprocesses the raw data for transmission.
@@ -35,9 +23,15 @@ void Sender::setDataBuffer(std::vector<char> newData) {
  * If the last nibble is the end of packet character, it is escaped according to the communication protocol.
  * Finally, the method logs the hexadecimal representation of each byte in the data vector.
  */
-void Sender::preprocess() {
+void Sender::preprocess(PackageType type) {
+    bool isDataPackage = type == PackageType::DATA_PKG;
+
+    if (isDataPackage) {
+        lastDataPackage = rawData;
+    }
+
     data.clear();
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 10; i++) {
         data.push_back(0);
     }
     data.push_back(ControlChars::PCK_START);
@@ -45,6 +39,8 @@ void Sender::preprocess() {
     checkSumme = Helper::calcChecksum(rawData);
     Logger::info("Checksumme: " + Helper::charToHex(checkSumme));
     rawData.push_back((char) (checkSumme & 0xFF));
+
+    rawData.insert(rawData.begin(), type);
 
     for (int i = 0; i < rawData.size(); i++) {
         Logger::info(Helper::charToHex(rawData.at(i)));
@@ -130,28 +126,34 @@ void Sender::reset(int channel) {
  * @param channel The channel to send data over. This should be an int representing the channel.
  * @param isPrimarySend A boolean indicating whether the method should write an acknowledgement or resend request to the channel. If true, the method sends data over the channel according to the communication protocol. If false, the method writes an acknowledgement or resend request to the channel.
  */
-void Sender::send(int channel, bool isPrimarySend) {
-    if (!isPrimarySend) {
-        if (!didSendOkResend) {
-            Logger::error("sending ack: checkTheSame: " + std::to_string(Config::checkSumIsFOCKINGtheSame));
-            Connector::getInstance().writeChannel(channel, Config::checkSumIsFOCKINGtheSame ? ControlChars::OK
-                                                                                            : ControlChars::RESEND);
-            didSendOkResend = true;
-        } else {
-            if (channel == Config::CHANNEL_A) {
-                Config::a_isWrite = false;
-            } else {
-                Config::b_isWrite = false;
-            }
-            Helper::setChannel(channel, false, Connector::getInstance().getDrv());
-            didSendOkResend = false;
-            reset(channel);
-        }
-        return;
-    }
+void Sender::send(int channel) {
+//    if (!isPrimarySend) {
+//        if (!didSendOkResend) {
+//            Logger::error("sending ack: checkTheSame: " + std::to_string(Config::checkSumIsFOCKINGtheSame));
+//            Connector::getInstance().writeChannel(channel, Config::checkSumIsFOCKINGtheSame ? ControlChars::OK
+//                                                                                            : ControlChars::RESEND);
+//            didSendOkResend = true;
+//        } else {
+//            if (channel == Config::CHANNEL_A) {
+//                Config::a_isWrite = false;
+//            } else {
+//                Config::b_isWrite = false;
+//            }
+//            Helper::setChannel(channel, false, Connector::getInstance().getDrv());
+//            didSendOkResend = false;
+//            reset(channel);
+//        }
+//        return;
+//    }
 
-    if (disableSend) {
+    if (sendQueue.empty() && data.empty()) {
+        Logger::info("sendQueue is empty");
         return;
+    } else if (!sendQueue.empty() && data.empty()) {
+        std::tuple<PackageType, std::vector<char>> packageDef = sendQueue.front();
+        rawData = std::get<1>(packageDef);
+        preprocess(std::get<0>(packageDef));
+        sendQueue.pop();
     }
 
     if (index < data.size()) {
@@ -161,16 +163,25 @@ void Sender::send(int channel, bool isPrimarySend) {
 
     index++;
 
-    if (index == data.size() + 1) {
+    if (index == data.size()) {
         // reset(channel);
         index = 0;
+        data = {};
 
-        if (channel == Config::CHANNEL_A) {
-            Config::a_isWrite = false;
-            Helper::setChannel(channel, false, Connector::getInstance().getDrv());
-        } else {
-            Config::b_isWrite = false;
-            Helper::setChannel(channel, false, Connector::getInstance().getDrv());
-        }
+//        if (channel == Config::CHANNEL_A) {
+//            Config::a_isWrite = false;
+//            Helper::setChannel(channel, false, Connector::getInstance().getDrv());
+//        } else {
+//            Config::b_isWrite = false;
+//            Helper::setChannel(channel, false, Connector::getInstance().getDrv());
+//        }
     }
+}
+
+void Sender::addToSendQueue(PackageType type, const std::vector<char>& newData) {
+    sendQueue.emplace(type, newData);
+}
+
+std::vector<char> Sender::getLastDataPackagePls() {
+    return lastDataPackage;
 }

@@ -8,7 +8,7 @@
 #include "io/IO.hpp"
 #include "logger/Logger.hpp"
 
-const int freq = 10;
+const int freq = 1;
 
 /**
  * @brief Prints a banner to the standard error output.
@@ -63,34 +63,18 @@ int main() {
     // drv.delay_ms(2000);
 
     while (1) {
-        if (!Config::a_isWrite) {
-            // Reader::read(Config::CHANNEL_A, Config::a_primarySend);
-            NewReader::read(Config::CHANNEL_A, Config::a_primarySend);
-        }
-        if (!Config::b_isWrite) {
-            // Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
-            NewReader::read(Config::CHANNEL_B, !Config::a_primarySend);
-        }
+        // read
+        // Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
+        NewReader::read(Config::CHANNEL_B);
         drv.delay_ms(freq);
 
         // write
-        if (Config::a_isWrite) {
-            Sender::send(Config::CHANNEL_A, Config::a_primarySend);
-        }
-        if (Config::b_isWrite) {
-            Sender::send(Config::CHANNEL_B, !Config::a_primarySend);
-        }
+        Sender::send(Config::CHANNEL_A);
         drv.delay_ms(freq);
 
         //read
-        if (!Config::a_isWrite) {
-            // Reader::read(Config::CHANNEL_A, Config::a_primarySend);
-            NewReader::read(Config::CHANNEL_A, Config::a_primarySend);
-        }
-        if (!Config::b_isWrite) {
-            // Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
-            NewReader::read(Config::CHANNEL_B, !Config::a_primarySend);
-        }
-         drv.delay_ms(freq);
+        // Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
+        NewReader::read(Config::CHANNEL_B);
+        drv.delay_ms(freq);
     }
 }

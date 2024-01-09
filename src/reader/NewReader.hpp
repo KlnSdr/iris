@@ -6,11 +6,13 @@
 #define IRIS_NEWREADER_HPP
 
 #include "../connector/Connector.hpp"
+#include "../config/Config.hpp"
 #include <vector>
+#include "../sender/Sender.hpp"
 
 class NewReader {
 public:
-    static void read(int channel, bool isPrimarySend);
+    static void read(int channel);
 
 private:
     static char compareValue;
@@ -23,6 +25,10 @@ private:
     static bool isSecondNibble;
     static std::vector<char> dataBuffer;
     static void processPackage();
+    static void processDataPackage();
+    static void processResponsePackage();
+    static char extractChecksum();
+    static bool didValidateMessage;
 };
 
 

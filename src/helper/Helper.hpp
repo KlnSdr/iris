@@ -16,4 +16,5 @@ public:
 
     static std::string charToHex(char chr);
     static void readNextBufferAndPackage();
+    static bool validateMessage(std::vector<char> data, char sendCheckSum);
 };

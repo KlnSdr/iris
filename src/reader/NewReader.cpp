@@ -9,19 +9,40 @@ bool NewReader::isESC1 = false;
 bool NewReader::isESC2 = false;
 bool NewReader::isESC3 = false;
 bool NewReader::inPackage = false;
+bool NewReader::didValidateMessage = false;
 char NewReader::buffer = 0;
 bool NewReader::isSecondNibble = false;
 std::vector<char> NewReader::dataBuffer = {};
 
-void NewReader::read(int channel, bool isPrimarySend) {
+void NewReader::read(int channel) {
     char value = Connector::getInstance().readChannel(channel);
     Logger::info("read: " + Helper::charToHex(value));
 
-    if (isPrimarySend) {
-        // todo
-        // do some stuff
-        return;
-    }
+//    if (isPrimarySend) {
+//        if (!didValidateMessage) {
+//            if (value == ControlChars::OK || value == ControlChars::RESEND) {
+//                if (value == ControlChars::OK) {
+//                    Logger::info("alles oki doki");
+//                    Helper::readNextBufferAndPackage();
+//                } else {
+//                    Logger::info("resend");
+//                }
+//                Logger::info("got val on primary send:" + Helper::charToHex(value));
+//                Logger::info("set everythingIsOkiDoki to " + std::to_string(value == ControlChars::OK));
+//                didValidateMessage = true;
+//            }
+//        } else {
+//            if (channel == Config::CHANNEL_A) {
+//                Config::a_isWrite = true;
+//                Helper::setChannel(channel, true, Connector::getInstance().getDrv());
+//            } else {
+//                Config::b_isWrite = true;
+//                Helper::setChannel(channel, true, Connector::getInstance().getDrv());
+//            }
+//            didValidateMessage = false;
+//        }
+//        return;
+//    }
 
     if (compareValue == value) {
         return;
@@ -54,7 +75,7 @@ void NewReader::read(int channel, bool isPrimarySend) {
     }
 
 
-    if(value == ControlChars::PCK_END && inPackage && !isESC2) {
+    if (value == ControlChars::PCK_END && inPackage && !isESC2) {
         inPackage = false;
         processPackage();
         return;
@@ -98,10 +119,75 @@ void NewReader::initPackage() {
 }
 
 void NewReader::processPackage() {
+    if (dataBuffer.empty()) {
+        Logger::error("dataBuffer is empty");
+        return;
+    }
+
+    char packageType = dataBuffer.at(0);
+    dataBuffer.erase(dataBuffer.begin());
+
+    Logger::error("packageType: " + Helper::charToHex(packageType));
+
+    if (packageType == PackageType::DATA_PKG) {
+        processDataPackage();
+    } else if (packageType == PackageType::RESPONSE_PKG) {
+        Logger::info("process response package");
+        processResponsePackage();
+    } else {
+        Logger::error("packageType is not valid");
+    }
+
+    initPackage();
+    inPackage = false;
+}
+
+void NewReader::processDataPackage() {
     for (char val: dataBuffer) {
         Logger::info(Helper::charToHex(val) + " -> " + val);
     }
-    Logger::info(std::string(dataBuffer.begin(), dataBuffer.end()));
-    initPackage();
-    inPackage = false;
+
+    char checkSum = extractChecksum();
+    bool checkSumsMatch = Helper::validateMessage(dataBuffer, checkSum);
+
+    Config::checkSumIsFOCKINGtheSame = checkSumsMatch;
+
+    std::vector<char> responsePkg = {};
+
+    if (!checkSumsMatch) {
+        Logger::error("Checksumme stimmt nicht überein");
+        responsePkg.push_back(ControlChars::RESEND);
+    } else {
+        std::cout << std::string(dataBuffer.begin(), dataBuffer.end());
+        responsePkg.push_back(ControlChars::OK);
+    }
+
+    Sender::addToSendQueue(PackageType::RESPONSE_PKG, responsePkg);
+}
+
+void NewReader::processResponsePackage() {
+    char checkSum = extractChecksum();
+    bool checkSumsMatch = Helper::validateMessage(dataBuffer, checkSum);
+
+    char responseCode = dataBuffer.at(0);
+    if (responseCode == ControlChars::OK) {
+        Logger::info("alles oki doki");
+        Helper::readNextBufferAndPackage();
+    } else if (responseCode == ControlChars::RESEND) {
+        Logger::info("resend");
+        Sender::addToSendQueue(PackageType::DATA_PKG, Sender::getLastDataPackagePls());
+    } else {
+        Logger::error("responseCode is not valid");
+    }
+}
+
+char NewReader::extractChecksum() {
+    if (dataBuffer.empty()) {
+        Logger::error("dataBuffer is empty");
+        return 0;
+    }
+
+    char checksum = dataBuffer.at(dataBuffer.size() - 1);
+    dataBuffer.pop_back();
+    return checksum;
 }

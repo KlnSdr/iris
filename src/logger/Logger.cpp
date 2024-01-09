@@ -19,12 +19,7 @@ void Logger::log(const std::string &level, const std::string &message, LogLevel 
         return;
     }
 
-    if (messageLevel == LogLevel::ERROR) {
-        std::cerr << "[" << level << "] " << message << std::endl;
-        return;
-    }
-
-    std::cout << "[" << level << "] " << message << std::endl;
+    std::cerr << "[" << level << "] " << message << std::endl;
 }
 
 void Logger::error(const std::string &message) {

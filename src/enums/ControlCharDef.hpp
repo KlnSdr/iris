@@ -33,5 +33,5 @@ enum ControlChars {
     RESEND = 0x0E,
     ESC1 = 0x0A, // Goethes inWerther
     ESC2 = 0x0D, // pixi
-    ESC3 = 0x0B  // 200Beathoven
+    ESC3 = 0x0B, // 200Beathoven
 };
