@@ -7,7 +7,6 @@
 char NewReader::compareValue = 0;
 bool NewReader::isESC1 = false;
 bool NewReader::isESC2 = false;
-bool NewReader::isESC3 = false;
 bool NewReader::inPackage = false;
 bool NewReader::didValidateMessage = false;
 char NewReader::buffer = 0;
@@ -50,40 +49,35 @@ void NewReader::read(int channel) {
 
     compareValue = value;
 
-    if (value == ControlChars::ESC3 && !isESC1 && !isESC2) {
-        isESC3 = true;
-        return;
-    }
-
     if (value == ControlChars::PCK_START && !inPackage) {
         initPackage();
         return;
     }
 
-    if (isESC1) {
-        value = (~value) & 0x0F;
-    }
-
-    if (value == ControlChars::ESC1 && !isESC2 && !isESC3) {
+    if (value == ControlChars::ESC1 && !isESC2) {
         isESC1 = true;
         return;
     }
 
-    if (value == ControlChars::ESC2 && !isESC1 && !isESC3) {
+    if (value == ControlChars::ESC2 && !isESC1) {
         isESC2 = true;
         return;
     }
 
+    if (value == ControlChars::ESC3 && !isESC1 && !isESC2) {
+        return;
+    }
 
-    if (value == ControlChars::PCK_END && inPackage && !isESC2) {
-        inPackage = false;
+    if (value == ControlChars::PCK_END && !isESC1 && !isESC2 && inPackage) {
         processPackage();
+
+        initPackage();
+        inPackage = false;
         return;
     }
 
     isESC1 = false;
     isESC2 = false;
-    isESC3 = false;
 
     if (!inPackage) {
         return;
@@ -111,7 +105,6 @@ void NewReader::initPackage() {
     compareValue = ControlChars::PCK_START;
     isESC1 = false;
     isESC2 = false;
-    isESC3 = false;
     inPackage = true;
     buffer = 0;
     isSecondNibble = false;
@@ -137,9 +130,6 @@ void NewReader::processPackage() {
     } else {
         Logger::error("packageType is not valid");
     }
-
-    initPackage();
-    inPackage = false;
 }
 
 void NewReader::processDataPackage() {

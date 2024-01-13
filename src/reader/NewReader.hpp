@@ -18,7 +18,6 @@ private:
     static char compareValue;
     static bool isESC1;
     static bool isESC2;
-    static bool isESC3;
     static bool inPackage;
     static void initPackage();
     static char buffer;

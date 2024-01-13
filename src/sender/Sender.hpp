@@ -26,6 +26,7 @@ public:
 
 private:
     static void preprocess(PackageType type);
+    static void escapeSymbol(char prevNibble, char currentNibble, std::vector<char>& dataBuffer);
 
     // static char let[11];
     static int index;

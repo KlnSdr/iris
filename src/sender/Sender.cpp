@@ -51,47 +51,16 @@ void Sender::preprocess(PackageType type) {
         char leftNibble = ((char) rawData[i] >> 4) & 0x0F;
         char rightNibble = (char) rawData[i] & 0x0F;
 
-        if (leftNibble == ControlChars::ESC1 || leftNibble == ControlChars::PCK_END || leftNibble == ControlChars::ESC3) {
-            data.push_back(ControlChars::ESC2);
-        } else if (leftNibble == ControlChars::ESC2 || leftNibble == lastNibble) {
-            leftNibble = (~leftNibble) & 0x0F;
-            if (leftNibble == ControlChars::ESC1) {
-                data.push_back(ControlChars::ESC2);
-                leftNibble = (~leftNibble) & 0x0F;
-            } else if (lastNibble == ControlChars::ESC1) {
-                data.push_back(ControlChars::ESC3);
-                leftNibble = (~leftNibble) & 0x0F;
-            } else {
-                data.push_back(ControlChars::ESC1);
-            }
-        }
-        data.push_back(leftNibble);
-
-
-        if (rightNibble == ControlChars::ESC1 || rightNibble == ControlChars::PCK_END || rightNibble == ControlChars::ESC3) {
-            data.push_back(ControlChars::ESC2);
-        } else if (rightNibble == ControlChars::ESC2 || rightNibble == leftNibble) {
-            rightNibble = (~rightNibble) & 0x0F;
-            if (rightNibble == ControlChars::ESC1) {
-                data.push_back(ControlChars::ESC2);
-                rightNibble = (~rightNibble) & 0x0F;
-            } else if (leftNibble == ControlChars::ESC1) {
-                data.push_back(ControlChars::ESC3);
-                rightNibble = (~rightNibble) & 0x0F;
-            } else {
-                data.push_back(ControlChars::ESC1);
-            }
-        }
-        data.push_back(rightNibble);
+        escapeSymbol(lastNibble, leftNibble, data);
+        escapeSymbol(leftNibble, rightNibble, data);
 
         lastNibble = rightNibble;
     }
+
     if (lastNibble == ControlChars::PCK_END) {
-        data.push_back(ControlChars::ESC1);
-        data.push_back((~ControlChars::PCK_END) & 0x0F);
-    } else {
-        data.push_back(ControlChars::PCK_END);
+        data.push_back(ControlChars::ESC3);
     }
+    data.push_back(ControlChars::PCK_END);
 
     for (int i = 0; i < data.size(); i++) {
         Logger::info(Helper::charToHex(data.at(i)));
@@ -184,4 +153,43 @@ void Sender::addToSendQueue(PackageType type, const std::vector<char>& newData) 
 
 std::vector<char> Sender::getLastDataPackagePls() {
     return lastDataPackage;
+}
+
+void Sender::escapeSymbol(char prevNibble, char currentNibble, std::vector<char> &dataBuffer) {
+    if (currentNibble == prevNibble && currentNibble == ControlChars::ESC1) {
+        dataBuffer.push_back(ControlChars::ESC2);
+    } else if (currentNibble == prevNibble && currentNibble == ControlChars::ESC2) {
+        dataBuffer.push_back(ControlChars::ESC1);
+    } else if (currentNibble == prevNibble && currentNibble == ControlChars::ESC3) {
+        dataBuffer.push_back(ControlChars::ESC1);
+    } else if (prevNibble == ControlChars::ESC1 && currentNibble == ControlChars::ESC2) {
+        dataBuffer.push_back(ControlChars::ESC3);
+        dataBuffer.push_back(ControlChars::ESC1);
+    } else if (prevNibble == ControlChars::ESC1 && currentNibble == ControlChars::ESC3) {
+        dataBuffer.push_back(ControlChars::ESC2);
+    } else if (prevNibble == ControlChars::ESC2 && currentNibble == ControlChars::ESC1) {
+        dataBuffer.push_back(ControlChars::ESC3);
+        dataBuffer.push_back(ControlChars::ESC2);
+    } else if (prevNibble == ControlChars::ESC2 && currentNibble == ControlChars::ESC3) {
+        dataBuffer.push_back(ControlChars::ESC1);
+    } else if (prevNibble == ControlChars::ESC3 && currentNibble == ControlChars::ESC1) {
+        dataBuffer.push_back(ControlChars::ESC2);
+    } else if (prevNibble == ControlChars::ESC3 && currentNibble == ControlChars::ESC2) {
+        dataBuffer.push_back(ControlChars::ESC1);
+    } else if (currentNibble == ControlChars::ESC1) {
+        dataBuffer.push_back(ControlChars::ESC2);
+    } else if (currentNibble == ControlChars::ESC2) {
+        dataBuffer.push_back(ControlChars::ESC1);
+    } else if (currentNibble == ControlChars::ESC3) {
+        dataBuffer.push_back(ControlChars::ESC1);
+    } else if (currentNibble == ControlChars::PCK_END && prevNibble == ControlChars::ESC1) {
+        dataBuffer.push_back(ControlChars::ESC2);
+    } else if (currentNibble == ControlChars::PCK_END && prevNibble == ControlChars::ESC2) {
+        dataBuffer.push_back(ControlChars::ESC1);
+    } else if (currentNibble == ControlChars::PCK_END) {
+        dataBuffer.push_back(ControlChars::ESC1);
+    } else if (prevNibble == currentNibble) {
+        dataBuffer.push_back(ControlChars::ESC3);
+    }
+    dataBuffer.push_back(currentNibble);
 }
