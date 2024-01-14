@@ -7,6 +7,11 @@
  *
  * @note The synchronization is disabled to speed up the I/O operations.
  */
+/**
+ * Shirley: "Ooh they've got a class on how to write jokes."
+ * Annie: "Don't take that. I dropped it after a class on setups. The professor is so old..."
+ * (Community, S2E20 - Competitive Wine Tasting)
+ */
 void Config::setup() {
     // Disables the synchronization of the C and C++ standard streams.
     std::ios::sync_with_stdio(false);

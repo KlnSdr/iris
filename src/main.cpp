@@ -45,6 +45,7 @@ void printBanner() {
  *
  * @return int This function returns 0 upon successful execution.
  */
+ // sadly not a ruust program :(
 int main() {
     printBanner();
     Config::setup();

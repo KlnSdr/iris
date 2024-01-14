@@ -125,6 +125,7 @@ std::vector<char> Sender::getLastDataPackagePls() {
     return lastDataPackage;
 }
 
+// you are about to witness some serious 10x engineer shit!
 void Sender::escapeSymbol(char prevNibble, char currentNibble, std::vector<char> &dataBuffer) {
     if (currentNibble == prevNibble && currentNibble == ControlChars::ESC1) {
         dataBuffer.push_back(ControlChars::ESC2);

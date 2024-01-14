@@ -35,7 +35,7 @@ char Helper::calcChecksum(std::vector<char> data) {
  * @param isWrite A boolean indicating whether the channel should be set to output mode (true) or input mode (false).
  * @param drv A reference to the B15F driver object used to interact with the hardware.
  */
-void Helper::setChannel(int channel, bool isWrite, B15F &drv) {
+void Helper::setChannel(int /*english*/ channel, bool isWrite, B15F &drv) {
     uint8_t value = drv.getRegister(&DDRA);
     Logger::error("aktuell ddra: " + Helper::charToHex(value));
 
