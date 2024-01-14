@@ -5,13 +5,13 @@
 #include <string>
 #include "../helper/Helper.hpp"
 #include "../config/Config.hpp"
-#include "../controlChars/ControlCharDef.hpp"
+#include "../enums/ControlCharDef.hpp"
 #include "../logger/Logger.hpp"
 #include "../connector/Connector.hpp"
 
 class Reader {
 public:
-    static void read(int channel, bool isPrimaryRead);
+    static void read(int channel, bool isPrimarySend);
 
 private:
     static bool escbool;

@@ -2,6 +2,7 @@
 #define IRIS_IO_HPP
 
 #include<iostream>
+#include <cstdio>
 
 class IO {
 public:

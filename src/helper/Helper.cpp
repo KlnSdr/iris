@@ -10,12 +10,17 @@
  * @param data The string for which to calculate the checksum. This should be a std::string containing the data.
  * @return The calculated checksum. This is an int representing the checksum of the given string.
  */
-int Helper::calcChecksum(std::string data) {
-    int checkSumme = 0;
-    for (int i = 0; i < data.length(); i++) {
-        checkSumme += data.at(i);
+char Helper::calcChecksum(std::vector<char> data) {
+    unsigned char checkSumme = 0;
+    Logger::debug("(((((((((((((((((((((((((((((((");
+    for (int i = 0; i < data.size(); i++) {
+        Logger::debug(Helper::charToHex(data.at(i)));
+        checkSumme += (char)(data.at(i) & 0xFF);
+        checkSumme &= 0xFF;
+        Logger::debug(" -> " + Helper::charToHex(checkSumme));
     }
-    return checkSumme % 0xFF;
+    Logger::debug("(((((((((((((((((((((((((((((((");
+    return (checkSumme % 0xFF) & 0xFF;
 }
 
 /**
@@ -32,11 +37,20 @@ int Helper::calcChecksum(std::string data) {
  */
 void Helper::setChannel(int channel, bool isWrite, B15F &drv) {
     uint8_t value = drv.getRegister(&DDRA);
-    Logger::debug("set channel " + charToHex(channel) + " to " + (isWrite ? "WRITE" : "READ"));
+    Logger::error("aktuell ddra: " + Helper::charToHex(value));
+
+    if (isWrite) {
+        Logger::error("setze " + std::to_string(channel) + " auf output");
+    } else {
+        Logger::error("setze " + std::to_string(channel) + " auf input");
+    }
+
     if (isWrite) {
         drv.setRegister(&DDRA, value | channel);
+        Logger::error("neu ddra: " + Helper::charToHex(value | channel));
     } else {
-        drv.setRegister(&DDRA, value & ~channel);
+        drv.setRegister(&DDRA, value & ((~channel) & 0xFF));
+        Logger::error("neu ddra: " + Helper::charToHex(value & ((~channel) & 0xFF)));
     }
 }
 
@@ -54,7 +68,35 @@ void Helper::setChannel(int channel, bool isWrite, B15F &drv) {
  */
 std::string Helper::charToHex(char chr) {
     std::stringstream ss;
-    ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(chr);
+    ss << std::setw(2) << std::setfill('0') << std::hex << ((int)chr & 0xFF);
     std::string hexString = ss.str();
     return hexString;
+}
+
+/**
+ * @brief Initializes the data buffer for transmission.
+ *
+ * This method reads data from the IO buffer into a local buffer of size Config::bufferSize.
+ * The number of bytes read is stored in the variable 'written'.
+ * A string 'value' is then created from the local buffer, starting from the beginning of the buffer and ending at the position determined by subtracting 'written' from Config::bufferSize.
+ * This string 'value' is then set as the data buffer in the Sender class using the setDataBuffer method.
+ */
+void Helper::readNextBufferAndPackage() {
+    char buffer[Config::bufferSize];
+    unsigned int bytesLeft = IO::readBuffer(buffer, Config::bufferSize);
+//    std::cout << "'";
+//    std::cout.write(buffer, Config::bufferSize - bytesLeft);
+//    std::cout << "'" << std::endl;
+    if (bytesLeft == Config::bufferSize) {
+        Logger::info("disable sender");
+        return;
+    }
+
+    std::vector<char> value(buffer, buffer + (Config::bufferSize - bytesLeft));
+    Sender::addToSendQueue(PackageType::DATA_PKG, value);
+}
+
+bool Helper::validateMessage(std::vector<char> data, char sendCheckSum) {
+    char checkSum = Helper::calcChecksum(data);
+    return checkSum == sendCheckSum;
 }

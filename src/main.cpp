@@ -1,5 +1,6 @@
 #include <b15f/b15f.h>
-#include "reader/Reader.hpp"
+//#include "reader/Reader.hpp"
+#include "reader/NewReader.hpp"
 #include "sender/Sender.hpp"
 #include <iostream>
 #include "config/Config.hpp"
@@ -8,22 +9,6 @@
 #include "logger/Logger.hpp"
 
 const int freq = 1;
-
-/**
- * @brief Initializes the data buffer for transmission.
- *
- * This method reads data from the IO buffer into a local buffer of size Config::bufferSize.
- * The number of bytes read is stored in the variable 'written'.
- * A string 'value' is then created from the local buffer, starting from the beginning of the buffer and ending at the position determined by subtracting 'written' from Config::bufferSize.
- * This string 'value' is then set as the data buffer in the Sender class using the setDataBuffer method.
- */
-void initDataBuffer() {
-    char buffer[Config::bufferSize];
-    unsigned int written = IO::readBuffer(buffer, Config::bufferSize);
-
-    std::string value = std::string(buffer, Config::bufferSize - written);
-    Sender::setDataBuffer(value);
-}
 
 /**
  * @brief Prints a banner to the standard error output.
@@ -64,9 +49,10 @@ void printBanner() {
  * @return int This function returns 0 upon successful execution.
  */
 int main() {
+//    freopen("/home/kilian/dev/cpp/iris/input.txt","r",stdin);
     printBanner();
     Config::setup();
-    initDataBuffer();
+    Helper::readNextBufferAndPackage();
 
     B15F &drv = Connector::getInstance().getDrv();
 
@@ -77,36 +63,18 @@ int main() {
     // drv.delay_ms(2000);
 
     while (1) {
-        if (!Config::a_isWrite) {
-            Logger::debug("R:A1");
-            Reader::read(Config::CHANNEL_A, Config::a_primarySend);
-        }
-        if (!Config::b_isWrite) {
-            Logger::debug("R:B1");
-            Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
-        }
-//        drv.delay_ms(freq);
+        // read
+        // Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
+        NewReader::read(Config::CHANNEL_B);
+        drv.delay_ms(freq);
 
         // write
-        if (Config::a_isWrite) {
-            Logger::debug("W:A");
-            Sender::send(Config::CHANNEL_A, Config::a_primarySend);
-        }
-        if (Config::b_isWrite) {
-            Logger::debug("W:B");
-            Sender::send(Config::CHANNEL_B, !Config::a_primarySend);
-        }
-//        drv.delay_ms(freq);
+        Sender::send(Config::CHANNEL_A);
+        drv.delay_ms(freq);
 
         //read
-        if (!Config::a_isWrite) {
-            Logger::debug("R:A2");
-            Reader::read(Config::CHANNEL_A, Config::a_primarySend);
-        }
-        if (!Config::b_isWrite) {
-            Logger::debug("R:B2");
-            Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
-        }
-        // drv.delay_ms(freq);
+        // Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
+        NewReader::read(Config::CHANNEL_B);
+        drv.delay_ms(freq);
     }
 }

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <b15f/b15f.h>
 #include <iostream>
 #include <string>
@@ -6,27 +8,33 @@
 #include <string>
 #include "../helper/Helper.hpp"
 #include "../config/Config.hpp"
-#include "../controlChars/ControlCharDef.hpp"
+#include "../enums/ControlCharDef.hpp"
+#include "../enums/PackageTypes.hpp"
 #include "../logger/Logger.hpp"
 #include "../connector/Connector.hpp"
+#include <queue>
+#include <tuple>
 
 class Sender {
 public:
-    static void send(int channel, bool isPrimarySend);
+    static void send(int channel);
 
     static void reset(int channel);
 
-    static void setDataBuffer(std::string newData);
+    static void addToSendQueue(PackageType type, const std::vector<char>& newData);
+    static std::vector<char> getLastDataPackagePls();
 
 private:
-
-    static void preprocess();
+    static void preprocess(PackageType type);
+    static void escapeSymbol(char prevNibble, char currentNibble, std::vector<char>& dataBuffer);
 
     // static char let[11];
     static int index;
     static char lastNibble;
+    static std::vector<char> lastDataPackage;
     static std::vector<char> data;
-    static std::string rawData;
-    static int checkSumme;
+    static std::vector<char> rawData;
+    static char checkSumme;
     static bool didSendOkResend;
+    static std::queue<std::tuple<PackageType, std::vector<char>>> sendQueue;
 };

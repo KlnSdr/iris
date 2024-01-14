@@ -27,38 +27,37 @@ int Reader::ghosting = 0;
  * @return A bool indicating whether the calculated checksum and the read checksum are equal. Returns true if the checksums are equal, false otherwise.
  */
 bool Reader::calculateCheckSumAndPrint() {
-    Logger::info("databuffer.size = " + std::to_string(dataBuffer.size()));
+    // Logger::info("databuffer.size = " + std::to_string(dataBuffer.size()));
     if (dataBuffer.size() < checkSumsize) {
         Logger::error("verworfen: zu kurz");
         return false;
     }
-    Logger::debug("=======");
+    Logger::info("=======");
     for (int i = 0; i < dataBuffer.size(); i++) {
-        Logger::debug(Helper::charToHex(dataBuffer.at(i)));
+        Logger::info(Helper::charToHex(dataBuffer.at(i)));
     }
-    Logger::debug("---");
+    Logger::info("---");
     int checkSum = 0;
 
     for (int i = 0; i < checkSumsize; i++) {
         int checksumByte = dataBuffer.at(dataBuffer.size() - i - 1) & 0xFF;
-        checkSum += checksumByte << i;
+        checkSum += (checksumByte << i) & 0xFF;
         Logger::debug(Helper::charToHex(checksumByte));
     }
     dataBuffer.resize(dataBuffer.size() - checkSumsize);
 
-    std::string dataBufferString(dataBuffer.begin(), dataBuffer.end());
-    int calcedCheckSum = Helper::calcChecksum(dataBufferString);
+    int calcedCheckSum = Helper::calcChecksum(dataBuffer);
 
-    Logger::debug("calced " + std::to_string(calcedCheckSum) + " == read " + std::to_string(checkSum) + "?");
+    Logger::info("calced " + Helper::charToHex(calcedCheckSum) + " == read " + Helper::charToHex(checkSum) + "?");
 
     bool isValidPackage = calcedCheckSum == checkSum;
 
     if (isValidPackage) {
         Logger::debug("gleich");
-        std::cout << dataBufferString << std::endl;
+        std::cout << std::string(dataBuffer.begin(), dataBuffer.end()) << std::endl;
     } else {
         Logger::error("nicht gleich");
-        Logger::info("verworfen, weil crc falsch");
+        // Logger::info("verworfen, weil crc falsch");
     }
 
     dataBuffer.clear();
@@ -103,7 +102,10 @@ void Reader::read(int channel, bool isPrimarySend) {
             }
             Logger::info("got val on primary send:" + Helper::charToHex(value));
             Logger::info("set everythingIsOkiDoki to " + std::to_string(value == ControlChars::OK));
-            Config::everythingIsOkiDoki = value == ControlChars::OK;
+
+            if (value == ControlChars::OK) {
+                Helper::readNextBufferAndPackage();
+            }
 
             if (channel == Config::CHANNEL_A) {
                 Config::a_isWrite = true;
@@ -174,12 +176,16 @@ void Reader::read(int channel, bool isPrimarySend) {
         esc2bool = false;
 
     } else if (value == ControlChars::PCK_END && esc2bool == false) {
-        endbool = true;
+        bool sendResponse = calculateCheckSumAndPrint();
+
+        escbool = false;
+        esc2bool = false;
         beginbool = false;
+        endbool = false;
         buffer = 0;
         offset = 0;
-
-        bool sendResponse = calculateCheckSumAndPrint();
+        pause = 0;
+        dataBuffer = {};
 
         if (!sendResponse) {
             return;
@@ -206,9 +212,12 @@ void Reader::read(int channel, bool isPrimarySend) {
     if (beginbool == true && endbool == false && esc2bool == false && escbool == false) {
 
         buffer <<= offset;
+        buffer &= 0xFF;
         Logger::debug("add to buffer: " + Helper::charToHex(value));
         buffer += value;
+        buffer &= 0xFF;
         offset += 4;
+        offset &= 0xFF;
 
         if (offset > 4) {
             Logger::debug("add to data buffer: " + Helper::charToHex(buffer));
