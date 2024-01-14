@@ -11,7 +11,7 @@
 
 class Helper {
 public:
-    static char calcChecksum(std::vector<char> data);
+    static char calcChecksum(const std::vector<char>& data);
 
     static void setChannel(int channel, bool isWrite, B15F &drv);
 

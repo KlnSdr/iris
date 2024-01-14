@@ -30,11 +30,11 @@ private:
 
     static void escapeSymbol(char prevNibble, char currentNibble, std::vector<char> &dataBuffer);
 
-    static int index;
+    static long unsigned int index;
     static char lastNibble;
     static std::vector<char> lastDataPackage;
     static std::vector<char> data;
     static std::vector<char> rawData;
-    static char checkSumme;
+    static char checkSum;
     static std::queue<std::tuple<PackageType, std::vector<char>>> sendQueue;
 };

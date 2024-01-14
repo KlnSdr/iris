@@ -10,12 +10,12 @@
  * @param data The string for which to calculate the checksum. This should be a std::string containing the data.
  * @return The calculated checksum. This is an int representing the checksum of the given string.
  */
-char Helper::calcChecksum(std::vector<char> data) {
+char Helper::calcChecksum(const std::vector<char>& data) {
     unsigned char checkSumme = 0;
     Logger::debug("(((((((((((((((((((((((((((((((");
-    for (int i = 0; i < data.size(); i++) {
-        Logger::debug(Helper::charToHex(data.at(i)));
-        checkSumme += (char) (data.at(i) & 0xFF);
+    for (char i : data) {
+        Logger::debug(Helper::charToHex(i));
+        checkSumme += (char) (i & 0xFF);
         checkSumme &= 0xFF;
         Logger::debug(" -> " + Helper::charToHex(checkSumme));
     }

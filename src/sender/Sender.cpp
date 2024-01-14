@@ -1,8 +1,8 @@
 #include "Sender.hpp"
 
 std::vector<char> Sender::rawData = {};
-int Sender::index = 0;
-char Sender::checkSumme = 0;
+long unsigned int Sender::index = 0;
+char Sender::checkSum = 0;
 char Sender::lastNibble = ControlChars::PCK_START;
 std::vector<char> Sender::data = {};
 std::queue<std::tuple<PackageType, std::vector<char>>> Sender::sendQueue = {};
@@ -34,20 +34,20 @@ void Sender::preprocess(PackageType type) {
     }
     data.push_back(ControlChars::PCK_START);
 
-    checkSumme = Helper::calcChecksum(rawData);
-    Logger::info("Checksumme: " + Helper::charToHex(checkSumme));
-    rawData.push_back((char) (checkSumme & 0xFF));
+    checkSum = Helper::calcChecksum(rawData);
+    Logger::info("Checksumme: " + Helper::charToHex(checkSum));
+    rawData.push_back((char) (checkSum & 0xFF));
 
     rawData.insert(rawData.begin(), type);
 
-    for (int i = 0; i < rawData.size(); i++) {
-        Logger::info(Helper::charToHex(rawData.at(i)));
+    for (char i : rawData) {
+        Logger::info(Helper::charToHex(i));
     }
     Logger::info("////////////////////////////////");
 
-    for (int i = 0; i < rawData.size(); i++) {
-        char leftNibble = ((char) rawData[i] >> 4) & 0x0F;
-        char rightNibble = (char) rawData[i] & 0x0F;
+    for (char i : rawData) {
+        char leftNibble = ((char) i >> 4) & 0x0F;
+        char rightNibble = (char) i & 0x0F;
 
         escapeSymbol(lastNibble, leftNibble, data);
         escapeSymbol(leftNibble, rightNibble, data);
@@ -60,8 +60,8 @@ void Sender::preprocess(PackageType type) {
     }
     data.push_back(ControlChars::PCK_END);
 
-    for (int i = 0; i < data.size(); i++) {
-        Logger::info(Helper::charToHex(data.at(i)));
+    for (char i : data) {
+        Logger::info(Helper::charToHex(i));
     }
     Logger::info("###########################");
 }
