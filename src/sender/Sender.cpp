@@ -40,12 +40,12 @@ void Sender::preprocess(PackageType type) {
 
     rawData.insert(rawData.begin(), type);
 
-    for (char i : rawData) {
+    for (char i: rawData) {
         Logger::info(Helper::charToHex(i));
     }
     Logger::info("////////////////////////////////");
 
-    for (char i : rawData) {
+    for (char i: rawData) {
         char leftNibble = ((char) i >> 4) & 0x0F;
         char rightNibble = (char) i & 0x0F;
 
@@ -60,7 +60,7 @@ void Sender::preprocess(PackageType type) {
     }
     data.push_back(ControlChars::PKG_END);
 
-    for (char i : data) {
+    for (char i: data) {
         Logger::info(Helper::charToHex(i));
     }
     Logger::info("###########################");
@@ -91,7 +91,7 @@ void Sender::reset(int channel) {
  * The index is then incremented.
  *
  * @param channel The channel to send data over. This should be an int representing the channel.
- * @param isPrimarySend A boolean indicating whether the method should write an acknowledgement or resend request to the channel. If true, the method sends data over the channel according to the communication protocol. If false, the method writes an acknowledgement or resend request to the channel.
+ * @param isPrimarySend A boolean indicating whether the method should writeMessage an acknowledgement or resend request to the channel. If true, the method sends data over the channel according to the communication protocol. If false, the method writes an acknowledgement or resend request to the channel.
  */
 void Sender::send(int channel) {
     if (sendQueue.empty() && data.empty()) {

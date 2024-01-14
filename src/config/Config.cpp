@@ -1,5 +1,7 @@
 #include "Config.hpp"
 
+bool Config::isRunning = true;
+
 /**
  * @brief This method is used to setup the Config class.
  *
@@ -8,7 +10,7 @@
  * @note The synchronization is disabled to speed up the I/O operations.
  */
 /**
- * Shirley: "Ooh they've got a class on how to write jokes."
+ * Shirley: "Ooh they've got a class on how to writeMessage jokes."
  * Annie: "Don't take that. I dropped it after a class on setups. The professor is so old..."
  * (Community, S2E20 - Competitive Wine Tasting)
  */

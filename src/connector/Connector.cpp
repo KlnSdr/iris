@@ -66,13 +66,13 @@ Connector Connector::getInstance() {
  * This combined value is then bitwise AND'd with the channel to ensure the value is written to the correct channel.
  * A debug log message is then written using the Logger class, indicating the channel written to and the value written.
  *
- * @param channel The channel to write to. This should be either Config::CHANNEL_A or Config::CHANNEL_B.
- * @param value The value to write to the specified channel. This should be a char with the 4 least significant bits
+ * @param channel The channel to writeMessage to. This should be either Config::CHANNEL_A or Config::CHANNEL_B.
+ * @param value The value to writeMessage to the specified channel. This should be a char with the 4 least significant bits
  * representing the value.
  */
 void Connector::writeChannel(int channel, char value) {
     drv.setRegister(&PORTA, (value | (value << 4)) & channel);
-    Logger::debug("write to channel " + std::to_string(channel) + ": " + Helper::charToHex(value));
+    Logger::debug("writeMessage to channel " + std::to_string(channel) + ": " + Helper::charToHex(value));
 }
 
 B15F &Connector::getDrv() const {
