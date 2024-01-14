@@ -3,7 +3,7 @@
 std::vector<char> Sender::rawData = {};
 long unsigned int Sender::index = 0;
 char Sender::checkSum = 0;
-char Sender::lastNibble = ControlChars::PCK_START;
+char Sender::lastNibble = ControlChars::PKG_START;
 std::vector<char> Sender::data = {};
 std::queue<std::tuple<PackageType, std::vector<char>>> Sender::sendQueue = {};
 std::vector<char> Sender::lastDataPackage = {};
@@ -32,7 +32,7 @@ void Sender::preprocess(PackageType type) {
     for (int i = 0; i < 10; i++) {
         data.push_back(0);
     }
-    data.push_back(ControlChars::PCK_START);
+    data.push_back(ControlChars::PKG_START);
 
     checkSum = Helper::calcChecksum(rawData);
     Logger::info("Checksumme: " + Helper::charToHex(checkSum));
@@ -55,10 +55,10 @@ void Sender::preprocess(PackageType type) {
         lastNibble = rightNibble;
     }
 
-    if (lastNibble == ControlChars::PCK_END) {
+    if (lastNibble == ControlChars::PKG_END) {
         data.push_back(ControlChars::ESC3);
     }
-    data.push_back(ControlChars::PCK_END);
+    data.push_back(ControlChars::PKG_END);
 
     for (char i : data) {
         Logger::info(Helper::charToHex(i));
@@ -153,11 +153,11 @@ void Sender::escapeSymbol(char prevNibble, char currentNibble, std::vector<char>
         dataBuffer.push_back(ControlChars::ESC1);
     } else if (currentNibble == ControlChars::ESC3) {
         dataBuffer.push_back(ControlChars::ESC1);
-    } else if (currentNibble == ControlChars::PCK_END && prevNibble == ControlChars::ESC1) {
+    } else if (currentNibble == ControlChars::PKG_END && prevNibble == ControlChars::ESC1) {
         dataBuffer.push_back(ControlChars::ESC2);
-    } else if (currentNibble == ControlChars::PCK_END && prevNibble == ControlChars::ESC2) {
+    } else if (currentNibble == ControlChars::PKG_END && prevNibble == ControlChars::ESC2) {
         dataBuffer.push_back(ControlChars::ESC1);
-    } else if (currentNibble == ControlChars::PCK_END) {
+    } else if (currentNibble == ControlChars::PKG_END) {
         dataBuffer.push_back(ControlChars::ESC1);
     } else if (prevNibble == currentNibble) {
         dataBuffer.push_back(ControlChars::ESC3);

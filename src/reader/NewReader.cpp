@@ -18,7 +18,7 @@ void NewReader::read(int channel) {
 
     compareValue = value;
 
-    if (value == ControlChars::PCK_START && !inPackage) {
+    if (value == ControlChars::PKG_START && !inPackage) {
         initPackage();
         return;
     }
@@ -37,7 +37,7 @@ void NewReader::read(int channel) {
         return;
     }
 
-    if (value == ControlChars::PCK_END && !isESC1 && !isESC2 && inPackage) {
+    if (value == ControlChars::PKG_END && !isESC1 && !isESC2 && inPackage) {
         processPackage();
 
         initPackage();
@@ -71,7 +71,7 @@ void NewReader::read(int channel) {
 }
 
 void NewReader::initPackage() {
-    compareValue = ControlChars::PCK_START;
+    compareValue = ControlChars::PKG_START;
     isESC1 = false;
     isESC2 = false;
     inPackage = true;

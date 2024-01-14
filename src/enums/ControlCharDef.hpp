@@ -8,8 +8,8 @@
  * Each control character is represented by a hexadecimal value.
  */
 enum ControlChars {
-    PCK_START = 0x05,
-    PCK_END = 0x07,
+    PKG_START = 0x05,
+    PKG_END = 0x07,
     OK = 0x09,
     RESEND = 0x0E,
     ESC1 = 0x0A, // this is Data
