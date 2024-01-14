@@ -8,7 +8,6 @@ char NewReader::compareValue = 0;
 bool NewReader::isESC1 = false;
 bool NewReader::isESC2 = false;
 bool NewReader::inPackage = false;
-bool NewReader::didValidateMessage = false;
 char NewReader::buffer = 0;
 bool NewReader::isSecondNibble = false;
 std::vector<char> NewReader::dataBuffer = {};
@@ -16,32 +15,6 @@ std::vector<char> NewReader::dataBuffer = {};
 void NewReader::read(int channel) {
     char value = Connector::getInstance().readChannel(channel);
     Logger::info("read: " + Helper::charToHex(value));
-
-//    if (isPrimarySend) {
-//        if (!didValidateMessage) {
-//            if (value == ControlChars::OK || value == ControlChars::RESEND) {
-//                if (value == ControlChars::OK) {
-//                    Logger::info("alles oki doki");
-//                    Helper::readNextBufferAndPackage();
-//                } else {
-//                    Logger::info("resend");
-//                }
-//                Logger::info("got val on primary send:" + Helper::charToHex(value));
-//                Logger::info("set everythingIsOkiDoki to " + std::to_string(value == ControlChars::OK));
-//                didValidateMessage = true;
-//            }
-//        } else {
-//            if (channel == Config::CHANNEL_A) {
-//                Config::a_isWrite = true;
-//                Helper::setChannel(channel, true, Connector::getInstance().getDrv());
-//            } else {
-//                Config::b_isWrite = true;
-//                Helper::setChannel(channel, true, Connector::getInstance().getDrv());
-//            }
-//            didValidateMessage = false;
-//        }
-//        return;
-//    }
 
     if (compareValue == value) {
         return;
@@ -140,8 +113,6 @@ void NewReader::processDataPackage() {
     char checkSum = extractChecksum();
     bool checkSumsMatch = Helper::validateMessage(dataBuffer, checkSum);
 
-    Config::checkSumIsFOCKINGtheSame = checkSumsMatch;
-
     std::vector<char> responsePkg = {};
 
     if (!checkSumsMatch) {
@@ -156,9 +127,6 @@ void NewReader::processDataPackage() {
 }
 
 void NewReader::processResponsePackage() {
-    char checkSum = extractChecksum();
-    bool checkSumsMatch = Helper::validateMessage(dataBuffer, checkSum);
-
     char responseCode = dataBuffer.at(0);
     if (responseCode == ControlChars::OK) {
         Logger::info("alles oki doki");

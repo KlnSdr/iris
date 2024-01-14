@@ -1,37 +1,18 @@
 #pragma once
 
 /**
- * @brief Enum representing control characters.
- *
- * This enum defines several control characters used in the communication protocol.
- * Each control character is represented by a hexadecimal value.
- *
  * @enum ControlChars
+ * @brief An enumeration to represent control characters.
  *
- * @var PCK_START
- * Start of packet character. Represented by the hexadecimal value 0x05.
- *
- * @var PCK_END
- * End of packet character. Represented by the hexadecimal value 0x07.
- *
- * @var OK
- * Acknowledgement character. Represented by the hexadecimal value 0x09.
- *
- * @var RESEND
- * Resend request character. Represented by the hexadecimal value 0x0E.
- *
- * @var ESC1
- * First escape character. Represented by the hexadecimal value 0x0A.
- *
- * @var ESC2
- * Second escape character. Represented by the hexadecimal value 0x0D.
+ * This enumeration defines several control characters used in the application.
+ * Each control character is represented by a hexadecimal value.
  */
 enum ControlChars {
-    PCK_START = 0x05,
-    PCK_END = 0x07,
-    OK = 0x09,
-    RESEND = 0x0E,
-    ESC1 = 0x0A, // Data
-    ESC2 = 0x0D, // Data
-    ESC3 = 0x0B, // 200Beathoven
+    PCK_START = 0x05, /**< Start of packet control character. */
+    PCK_END = 0x07, /**< End of packet control character. */
+    OK = 0x09, /**< OK control character. */
+    RESEND = 0x0E, /**< Resend control character. */
+    ESC1 = 0x0A, /**< First escape control character, used for data. */
+    ESC2 = 0x0D, /**< Second escape control character, used for data. */
+    ESC3 = 0x0B, /**< Third escape control character, used for 200Beathoven. */
 };

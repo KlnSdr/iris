@@ -1,5 +1,7 @@
 #include "Helper.hpp"
 
+#include <utility>
+
 /**
  * @brief Calculates the checksum of a given string.
  *
@@ -97,6 +99,6 @@ void Helper::readNextBufferAndPackage() {
 }
 
 bool Helper::validateMessage(std::vector<char> data, char sendCheckSum) {
-    char checkSum = Helper::calcChecksum(data);
+    char checkSum = Helper::calcChecksum(std::move(data)); // thx CLion for the move suggestion and copilot for this comment
     return checkSum == sendCheckSum;
 }

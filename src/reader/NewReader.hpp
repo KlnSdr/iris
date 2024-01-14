@@ -27,7 +27,6 @@ private:
     static void processDataPackage();
     static void processResponsePackage();
     static char extractChecksum();
-    static bool didValidateMessage;
 };
 
 

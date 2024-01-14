@@ -1,5 +1,4 @@
 #include <b15f/b15f.h>
-//#include "reader/Reader.hpp"
 #include "reader/NewReader.hpp"
 #include "sender/Sender.hpp"
 #include <iostream>
@@ -8,7 +7,7 @@
 #include "io/IO.hpp"
 #include "logger/Logger.hpp"
 
-const int freq = 1;
+const int freq = 10;
 
 /**
  * @brief Prints a banner to the standard error output.
@@ -49,22 +48,19 @@ void printBanner() {
  * @return int This function returns 0 upon successful execution.
  */
 int main() {
-//    freopen("/home/kilian/dev/cpp/iris/input.txt","r",stdin);
     printBanner();
     Config::setup();
     Helper::readNextBufferAndPackage();
 
     B15F &drv = Connector::getInstance().getDrv();
 
-    Helper::setChannel(Config::CHANNEL_A, Config::a_isWrite, drv);
-    Helper::setChannel(Config::CHANNEL_B, Config::b_isWrite, drv);
+    Helper::setChannel(Config::CHANNEL_A, true, drv);   // set A to write
+    Helper::setChannel(Config::CHANNEL_B, false, drv);  // set B to read
 
     Sender::reset(Config::CHANNEL_A);
-    // drv.delay_ms(2000);
 
     while (1) {
         // read
-        // Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
         NewReader::read(Config::CHANNEL_B);
         drv.delay_ms(freq);
 
@@ -73,7 +69,6 @@ int main() {
         drv.delay_ms(freq);
 
         //read
-        // Reader::read(Config::CHANNEL_B, !Config::a_primarySend);
         NewReader::read(Config::CHANNEL_B);
         drv.delay_ms(freq);
     }

@@ -28,13 +28,11 @@ private:
     static void preprocess(PackageType type);
     static void escapeSymbol(char prevNibble, char currentNibble, std::vector<char>& dataBuffer);
 
-    // static char let[11];
     static int index;
     static char lastNibble;
     static std::vector<char> lastDataPackage;
     static std::vector<char> data;
     static std::vector<char> rawData;
     static char checkSumme;
-    static bool didSendOkResend;
     static std::queue<std::tuple<PackageType, std::vector<char>>> sendQueue;
 };
