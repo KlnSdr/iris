@@ -1,7 +1,5 @@
 #include "Helper.hpp"
 
-#include <utility>
-
 /**
  * @brief Calculates the checksum of a given string.
  *
@@ -17,7 +15,7 @@ char Helper::calcChecksum(std::vector<char> data) {
     Logger::debug("(((((((((((((((((((((((((((((((");
     for (int i = 0; i < data.size(); i++) {
         Logger::debug(Helper::charToHex(data.at(i)));
-        checkSumme += (char)(data.at(i) & 0xFF);
+        checkSumme += (char) (data.at(i) & 0xFF);
         checkSumme &= 0xFF;
         Logger::debug(" -> " + Helper::charToHex(checkSumme));
     }
@@ -70,7 +68,7 @@ void Helper::setChannel(int channel, bool isWrite, B15F &drv) {
  */
 std::string Helper::charToHex(char chr) {
     std::stringstream ss;
-    ss << std::setw(2) << std::setfill('0') << std::hex << ((int)chr & 0xFF);
+    ss << std::setw(2) << std::setfill('0') << std::hex << ((int) chr & 0xFF);
     std::string hexString = ss.str();
     return hexString;
 }
@@ -86,9 +84,6 @@ std::string Helper::charToHex(char chr) {
 void Helper::readNextBufferAndPackage() {
     char buffer[Config::bufferSize];
     unsigned int bytesLeft = IO::readBuffer(buffer, Config::bufferSize);
-//    std::cout << "'";
-//    std::cout.write(buffer, Config::bufferSize - bytesLeft);
-//    std::cout << "'" << std::endl;
     if (bytesLeft == Config::bufferSize) {
         Logger::info("disable sender");
         return;
@@ -99,6 +94,7 @@ void Helper::readNextBufferAndPackage() {
 }
 
 bool Helper::validateMessage(std::vector<char> data, char sendCheckSum) {
-    char checkSum = Helper::calcChecksum(std::move(data)); // thx CLion for the move suggestion and copilot for this comment
+    char checkSum = Helper::calcChecksum(
+            std::move(data)); // thx CLion for the move suggestion and copilot for this comment
     return checkSum == sendCheckSum;
 }

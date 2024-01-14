@@ -1,7 +1,3 @@
-//
-// Created by kilian on 03.01.24.
-//
-
 #ifndef IRIS_NEWREADER_HPP
 #define IRIS_NEWREADER_HPP
 
@@ -19,13 +15,19 @@ private:
     static bool isESC1;
     static bool isESC2;
     static bool inPackage;
+
     static void initPackage();
+
     static char buffer;
     static bool isSecondNibble;
     static std::vector<char> dataBuffer;
+
     static void processPackage();
+
     static void processDataPackage();
+
     static void processResponsePackage();
+
     static char extractChecksum();
 };
 

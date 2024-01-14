@@ -21,12 +21,14 @@ public:
 
     static void reset(int channel);
 
-    static void addToSendQueue(PackageType type, const std::vector<char>& newData);
+    static void addToSendQueue(PackageType type, const std::vector<char> &newData);
+
     static std::vector<char> getLastDataPackagePls();
 
 private:
     static void preprocess(PackageType type);
-    static void escapeSymbol(char prevNibble, char currentNibble, std::vector<char>& dataBuffer);
+
+    static void escapeSymbol(char prevNibble, char currentNibble, std::vector<char> &dataBuffer);
 
     static int index;
     static char lastNibble;

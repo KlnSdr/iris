@@ -1,7 +1,3 @@
-//
-// Created by kilian on 09.01.24.
-//
-
 #ifndef IRIS_PACKAGETYPES_HPP
 #define IRIS_PACKAGETYPES_HPP
 

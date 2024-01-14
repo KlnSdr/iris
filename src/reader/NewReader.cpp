@@ -1,7 +1,3 @@
-//
-// Created by kilian on 03.01.24.
-//
-
 #include "NewReader.hpp"
 
 char NewReader::compareValue = 0;

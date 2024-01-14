@@ -117,7 +117,7 @@ void Sender::send(int channel) {
     }
 }
 
-void Sender::addToSendQueue(PackageType type, const std::vector<char>& newData) {
+void Sender::addToSendQueue(PackageType type, const std::vector<char> &newData) {
     sendQueue.emplace(type, newData);
 }
 
