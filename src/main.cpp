@@ -77,6 +77,7 @@ void startInActiveMode() {
         NewReader::read(Config::CHANNEL_B);
         drv.delay_ms(freq);
     }
+    Sender::reset(Config::CHANNEL_A);
 }
 
 void readArgsAndRun(int argc, char **argv) {
