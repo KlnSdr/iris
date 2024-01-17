@@ -95,7 +95,7 @@ void readArgsAndRun(int argc, char **argv) {
             std::cout << "Usage: " << argv[0] << " [OPTION]" << std::endl;
             std::cout << "  -c, --console" << std::endl;
             std::cout << "  -h, --help" << std::endl;
-            exit(0);
+            return;
         } else {
             std::cerr << "Unknown argument " << arg << std::endl;
         }
