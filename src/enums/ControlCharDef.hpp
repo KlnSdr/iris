@@ -15,4 +15,5 @@ enum ControlChars {
     ESC1 = 0x0A, // this is Data
     ESC2 = 0x0D, // this is Data t(o/w)o
     ESC3 = 0x0B, // 200Beathoven
+    BEACON = 0xF
 };

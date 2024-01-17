@@ -1,5 +1,7 @@
 #include "Config.hpp"
 
+bool Config::gotBeacon = false;
+
 bool Config::isRunning = true;
 
 /**
@@ -10,7 +12,7 @@ bool Config::isRunning = true;
  * @note The synchronization is disabled to speed up the I/O operations.
  */
 /**
- * Shirley: "Ooh they've got a class on how to writeMessage jokes."
+ * Shirley: "Ooh they've got a class on how to write jokes."
  * Annie: "Don't take that. I dropped it after a class on setups. The professor is so old..."
  * (Community, S2E20 - Competitive Wine Tasting)
  */

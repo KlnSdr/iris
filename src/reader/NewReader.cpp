@@ -18,6 +18,12 @@ void NewReader::read(int channel) {
 
     compareValue = value;
 
+    if (value == ControlChars::BEACON && !Config::gotBeacon) {
+        Config::gotBeacon = true;
+        Logger::info("got beacon");
+        return;
+    }
+
     if (value == ControlChars::PKG_START && !inPackage) {
         initPackage();
         return;

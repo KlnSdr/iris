@@ -4,6 +4,8 @@
 #include <iostream>
 #include "config/Config.hpp"
 #include "helper/Helper.hpp"
+#include "connector/Connector.hpp"
+#include "enums/ControlCharDef.hpp"
 #include "console/ConsoleReceiver.hpp"
 #include "console/Console.hpp"
 #include <unistd.h>
@@ -58,7 +60,9 @@ void startInActiveMode() {
     Helper::setChannel(Config::CHANNEL_A, true, drv);   // set A to writeMessage
     Helper::setChannel(Config::CHANNEL_B, false, drv);  // set B to read
 
-    Sender::reset(Config::CHANNEL_A);
+    Connector::getInstance().writeChannel(Config::CHANNEL_A, ControlChars::BEACON);
+
+    char listenOnlyIterations = 10;
 
     while (Config::isRunning) {
         // readMessage from console
@@ -69,12 +73,17 @@ void startInActiveMode() {
         NewReader::read(Config::CHANNEL_B);
         drv.delay_ms(freq);
 
-        // writeMessage
-        Sender::send(Config::CHANNEL_A);
-        drv.delay_ms(freq);
-
         //read
         NewReader::read(Config::CHANNEL_B);
+        drv.delay_ms(freq);
+
+        if (listenOnlyIterations > 0) {
+            listenOnlyIterations--;
+            continue;
+        }
+
+        // write
+        Sender::send(Config::CHANNEL_A);
         drv.delay_ms(freq);
     }
     Sender::reset(Config::CHANNEL_A);
