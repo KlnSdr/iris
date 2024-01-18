@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include "../communication/NamedPipe.hpp"
 #include "../config/Config.hpp"
+#include "../logger/Logger.hpp"
 
 class ConsoleReceiver {
 public:

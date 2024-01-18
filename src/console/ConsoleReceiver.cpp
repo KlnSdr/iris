@@ -12,6 +12,6 @@ void ConsoleReceiver::interpretCommand(char *command) {
     if (strcmp(command, "exit") == 0) {
         Config::isRunning = false;
     } else {
-        std::cout << "Unknown command: " << command << std::endl;
+        Logger::error("Unknown command: " + std::string(command));
     }
 }

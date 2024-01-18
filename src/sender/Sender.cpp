@@ -94,6 +94,10 @@ void Sender::reset(int channel) {
  * @param isPrimarySend A boolean indicating whether the method should writeMessage an acknowledgement or resend request to the channel. If true, the method sends data over the channel according to the communication protocol. If false, the method writes an acknowledgement or resend request to the channel.
  */
 void Sender::send(int channel) {
+    if (!Config::gotBeacon) {
+        return;
+    }
+
     if (sendQueue.empty() && data.empty()) {
         Logger::info("sendQueue is empty");
         return;
