@@ -15,6 +15,8 @@ public:
     static const int bufferSize = 256;
 
     static const Logger::LogLevel logLevel = Logger::LogLevel::INFO;
+
+    static bool isRunning;
 };
 
 
