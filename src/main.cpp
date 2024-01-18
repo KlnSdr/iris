@@ -5,7 +5,7 @@
 #include "config/Config.hpp"
 #include "helper/Helper.hpp"
 
-const int freq = 10;
+const int freq = 1;
 
 /**
  * @brief Prints a banner to the standard error output.

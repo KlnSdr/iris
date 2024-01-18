@@ -84,7 +84,7 @@ std::string Helper::charToHex(char chr) {
 void Helper::readNextBufferAndPackage() {
     char buffer[Config::bufferSize];
     unsigned int bytesLeft = IO::readBuffer(buffer, Config::bufferSize);
-    if (bytesLeft == Config::bufferSize) {
+    if (bytesLeft >= Config::bufferSize) {
         Logger::info("disable sender");
         return;
     }
