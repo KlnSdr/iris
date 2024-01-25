@@ -10,10 +10,10 @@
  * @param data The string for which to calculate the checksum. This should be a std::string containing the data.
  * @return The calculated checksum. This is an int representing the checksum of the given string.
  */
-char Helper::calcChecksum(const std::vector<char>& data) {
+char Helper::calcChecksum(const std::vector<char> &data) {
     unsigned char checkSumme = 0;
     Logger::debug("(((((((((((((((((((((((((((((((");
-    for (char i : data) {
+    for (char i: data) {
         Logger::debug(Helper::charToHex(i));
         checkSumme += (char) (i & 0xFF);
         checkSumme &= 0xFF;
@@ -85,7 +85,12 @@ void Helper::readNextBufferAndPackage() {
     char buffer[Config::bufferSize];
     unsigned int bytesLeft = IO::readBuffer(buffer, Config::bufferSize);
     if (bytesLeft >= Config::bufferSize) {
+        if (Config::willSendEOT) {
+            return;
+        }
         Logger::info("disable sender");
+        Config::willSendEOT = true;
+        Sender::addToSendQueue(PackageType::CONTROL_PKG, {ControlChars::EOT});
         return;
     }
 

@@ -18,6 +18,9 @@ public:
     static bool gotBeacon;
 
     static bool isRunning;
+    static bool didSendEOT;
+    static bool willSendEOT;
+    static bool gotEOT;
 };
 
 

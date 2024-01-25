@@ -100,6 +100,9 @@ void Sender::send(int channel) {
 
     if (sendQueue.empty() && data.empty()) {
         Logger::info("sendQueue is empty");
+        if (Config::willSendEOT) {
+            Config::didSendEOT = true;
+        }
         return;
     } else if (!sendQueue.empty() && data.empty()) {
         std::tuple<PackageType, std::vector<char>> packageDef = sendQueue.front();

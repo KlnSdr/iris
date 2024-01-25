@@ -4,6 +4,10 @@ bool Config::gotBeacon = false;
 
 bool Config::isRunning = true;
 
+bool Config::didSendEOT = false;
+bool Config::willSendEOT = false;
+bool Config::gotEOT = false;
+
 /**
  * @brief This method is used to setup the Config class.
  *

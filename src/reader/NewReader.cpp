@@ -102,6 +102,9 @@ void NewReader::processPackage() {
     } else if (packageType == PackageType::RESPONSE_PKG) {
         Logger::info("process response package");
         processResponsePackage();
+    } else if (packageType == PackageType::CONTROL_PKG) {
+        Logger::info("process control package");
+        processControlPackage();
     } else {
         Logger::error("packageType is not valid");
     }
@@ -136,6 +139,16 @@ void NewReader::processResponsePackage() {
     } else if (responseCode == ControlChars::RESEND) {
         Logger::info("resend");
         Sender::addToSendQueue(PackageType::DATA_PKG, Sender::getLastDataPackagePls());
+    } else {
+        Logger::error("responseCode is not valid");
+    }
+}
+
+void NewReader::processControlPackage() {
+    char controlChar = dataBuffer.at(0);
+    if (controlChar == ControlChars::EOT) {
+        Logger::info("sender is done!");
+        Config::gotEOT = true;
     } else {
         Logger::error("responseCode is not valid");
     }

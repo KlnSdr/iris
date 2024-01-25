@@ -28,6 +28,8 @@ private:
 
     static void processResponsePackage();
 
+    static void processControlPackage();
+
     static char extractChecksum();
 };
 

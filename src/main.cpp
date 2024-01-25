@@ -62,9 +62,9 @@ void startInActiveMode() {
 
     Connector::getInstance().writeChannel(Config::CHANNEL_A, ControlChars::BEACON);
 
-    char listenOnlyIterations = 10;
+    int listenOnlyIterations = 50;
 
-    while (Config::isRunning) {
+    while (Config::isRunning && !(Config::didSendEOT && Config::gotEOT)) {
         // readMessage from console
         ConsoleReceiver::run();
 //        usleep(10000);
